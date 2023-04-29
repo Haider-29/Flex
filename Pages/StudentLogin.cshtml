@@ -1,0 +1,73 @@
+﻿@page
+@model StudentLoginModel
+@{
+    ViewData["Title"] = "Student Login";
+}
+
+<style>
+    .login-card {
+        background-color: #FFFFFF;
+        border-radius: 20px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        margin-top: 40px;
+    }
+
+    .login-title {
+        text-align: center;
+        font-size: 32px;
+        color: #333333;
+    }
+
+    .login-input {
+        border-radius: 5px;
+        border: 1px solid #CCCCCC;
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .login-button {
+        background-color: #4A47A3;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .login-button:hover {
+            background-color: #333399;
+        }
+
+</style>
+
+<div class="container">
+    <div class="login-card">
+        <h2 class="login-title">Student Login</h2>
+        <br />
+        <form method="post">
+            <input type="text" class="login-input" placeholder="Roll Number" asp-for="RollNumber" required />
+            <input type="password" class="login-input" placeholder="Password" asp-for="Password" required />
+            <button type="submit" class="login-button">Login</button>
+            <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message) ? "" : "display:none;")">@Model.Message</p>
+        </form>
+        <br />
+        <div class="text-center">
+            <a href="#" class="text-muted" onclick = "OptionSelected()" >Don't have an account? Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function OptionSelected() {
+        // Redirect to appropriate page based on user selection
+        window.location.href = "/StudentSignUp";
+    }
+</script>

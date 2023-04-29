@@ -1,0 +1,29 @@
+body {
+    background: linear-gradient(to right, #c7b8e8, #12c2e9, #f64f59);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.card-selection {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+    .card-selection:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }

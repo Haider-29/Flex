@@ -1,0 +1,57 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to My Website!</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~css/site.css" rel="stylesheet"/>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-5">Welcome to FLEX!</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-selection">
+                    <div class="card-body">
+                        <h5 class="card-title">Are you a...</h5>
+                             <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action" onclick="OptionSelected('Student')">Student</a>
+                            <a href="#" class="list-group-item list-group-item-action" onclick="OptionSelected('Faculty')">Faculty</a>
+                            <a href="#" class="list-group-item list-group-item-action" onclick="OptionSelected('Academic Office')">Academic Office</a>
+
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        var Options = @Json.Serialize(new List<string> { "Student", "Faculty", "Academic Office" });
+
+        function OptionSelected(option) {
+            // Redirect to appropriate page based on user selection
+            if (option == "Student") {
+                window.location.href = "/StudentLogin";
+            }
+            else if (option == "Faculty") {
+                window.location.href = "/FacultyLogin";
+            }
+            else if (option == "Academic Office") {
+                window.location.href = "/AcademicLogin";
+            }
+        }
+    </script>
+</body>
+</html>
