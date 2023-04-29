@@ -3,5 +3,83 @@
 @{
 }
 
+<head>
+    <title>Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'Home')">Home</button>
+        <button class="tablinks" onclick="openCity(event, 'Marks')">Marks</button>
+        <button class="tablinks" onclick="openCity(event, 'Attendance')">Attendance</button>
+    </div>
 
-<div>Random HTML</div>
+    <div id="Home" class="tabcontent">
+        <h3>Home</h3>
+        <p>Student's Info</p>
+    </div>
+
+    <div id="Marks" class="tabcontent">
+        <h3>Marks</h3>
+        <p>Marks of Student</p>
+    </div>
+
+    <div id="Attendance" class="tabcontent">
+        <h3>Attendance</h3>
+        <p>Attendance of Student</p>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+<style>
+    * {
+        box-sizing: border-box
+    }
+
+   /* .tab_header {
+        position: fixed
+    }*/
+    /* Style the tab */
+    .tab {
+        float: left;
+        /*border: 1px solid #ccc;*/
+        background-color: #000033;
+        width: 10%;
+        height: 1000px;
+    }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            display: block;
+            background-color: inherit;
+            color: white;
+            padding: 22px 16px;
+            width: 100%;
+            border: none;
+            outline: none;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            /* Change background color of buttons on hover */
+            .tab button:hover {
+                background-color: #b3d1ff;
+            }
+
+            /* Create an active/current "tab button" class */
+            .tab button.active {
+                background-color: #ccc;
+            }
+
+    /* Style the tab content */
+    .tabcontent {
+        float: left;
+        padding: 0px 12px;
+        border: 1px solid #ccc;
+        width: 70%;
+        border-left: none;
+        height: 300px;
+    }
+</style>
