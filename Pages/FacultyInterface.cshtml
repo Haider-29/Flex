@@ -49,7 +49,6 @@
         border-color: #80bdff;
         box-shadow: 0 0 0 0.25
 
-
 </style>
 <body>
     <div class="container mt-5">
@@ -98,13 +97,13 @@
                         </tr>
                         <tr>
                             <td>CS201</td>
-                            <td><a href="#">Data Structures and Algorithms</a></td>
+                            <td><a href="#exampleModalCenter" data-toggle="modal">Data Structures and Algorithms</a></td>
                             <td>Section B</td>
                             <td>Ibrahim</td>
                         </tr>
                         <tr>
                             <td>CS301</td>
-                            <td><a href="#">Database Systems</a></td>
+                            <td><a href="#exampleModalCenter" data-toggle="modal">Database Systems</a></td>
                             <td>Section C</td>
                             <td>Ibrahim</td>
                         </tr>
@@ -114,13 +113,62 @@
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Set Marks Distributions</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    ...
+                                    <div class="container mt-4">
+
+                                        <hr>
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Course Name - Section XYZ</h5>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <form>
+                                                            <div class="form-group">
+                                                                <label for="sessional1">Sessional I:</label>
+                                                                <input type="range" class="form-range" min="0" max="100" id="sessional1">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="assignment">Assignments:</label>
+                                                                <input type="range" class="form-range" min="0" max="100" id="assignment">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="quiz">Quizzes:</label>
+                                                                <input type="range" class="form-range" min="0" max="100" id="quiz">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="sessional2">Sessional II:</label>
+                                                                <input type="range" class="form-range" min="0" max="100" id="sessional2">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="final">Final Exam:</label>
+                                                                <input type="range" class="form-range" min="0" max="100" id="final">
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">Marks Distribution Summary</h5>
+                                                                <ul class="list-group list-group-flush">
+                                                                    <li class="list-group-item">Sessional I: <span class="float-end" id="s1">0%</span></li>
+                                                                    <li class="list-group-item">Assignments: <span class="float-end" id="ass">0%</span></li>
+                                                                    <li class="list-group-item">Quizzes: <span class="float-end" id="quizm">0%</span></li>
+                                                                    <li class="list-group-item">Sessional II: <span class="float-end" id="s2">0%</span></li>
+                                                                    <li class="list-group-item">Final Exam: <span class="float-end" id="finalm">0%</span></li>
+                                                                    <li class="list-group-item">Total Marks: <span class="float-end" id="total">0/100</span></li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -136,61 +184,13 @@
 
 
 
-    <div class="container mt-4">
-        <h2>Set Marks Distributions</h2>
-        <hr>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Course Name - Section XYZ</h5>
-                <div class="row">
-                    <div class="col-6">
-                        <form>
-                            <div class="form-group">
-                                <label for="sessional1">Sessional I:</label>
-                                <input type="range" class="form-range" min="0" max="100" id="sessional1">
-                            </div>
-                            <div class="form-group">
-                                <label for="assignment">Assignments:</label>
-                                <input type="range" class="form-range" min="0" max="100" id="assignment">
-                            </div>
-                            <div class="form-group">
-                                <label for="quiz">Quizzes:</label>
-                                <input type="range" class="form-range" min="0" max="100" id="quiz">
-                            </div>
-                            <div class="form-group">
-                                <label for="sessional2">Sessional II:</label>
-                                <input type="range" class="form-range" min="0" max="100" id="sessional2">
-                            </div>
-                            <div class="form-group">
-                                <label for="final">Final Exam:</label>
-                                <input type="range" class="form-range" min="0" max="100" id="final">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Marks Distribution Summary</h5>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Sessional I: <span class="float-end" id="s1">0%</span></li>
-                                    <li class="list-group-item">Assignments: <span class="float-end" id="ass">0%</span></li>
-                                    <li class="list-group-item">Quizzes: <span class="float-end" id="quizm">0%</span></li>
-                                    <li class="list-group-item">Sessional II: <span class="float-end" id="s2">0%</span></li>
-                                    <li class="list-group-item">Final Exam: <span class="float-end" id="finalm">0%</span></li>
-                                    <li class="list-group-item">Total Marks: <span class="float-end" id="total">0/100</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
 
 
 
-                        

@@ -3,13 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace FLEXX.Pages
 {
-    public class FacultyInterfaceModel : PageModel
+    public class StudentInterfaceModel : PageModel
     {
         public void OnGet()
         {
         }
     }
 }
-
-// ibrahim was here
-// another run after running
