@@ -64,20 +64,25 @@
         <div class="card">
             <div class="card-header">Add New Course</div>
             <div class="card-body">
-                <form>
+                <form method="post" asp-page-handler="NewCourse">
                     <div class="form-title">Enter Course Details</div>
                     <div class="form-group">
-                        <label for="course-id">Course ID</label>
-                        <input type="text" class="form-control" id="course-id">
-                    </div>
-                    <div class="form-group">
                         <label for="course-code">Course Code</label>
-                        <input type="text" class="form-control" id="course-code">
+                        <input type="text" class="form-control" id="course-code" asp-for = "NCourseCode" required>
                     </div>
                     <div class="form-group">
                         <label for="course-name">Course Name</label>
-                        <input type="text" class="form-control" id="course-name">
+                        <input type="text" class="form-control" id="course-name" asp-for = "NCourseName" required>
                     </div>
+                    <div class="form-group">
+                        <label for="course-ch">Credit Hours</label>
+                        <input type="text" class="form-control" id="course-ch" asp-for = "NCreditHours" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="course-name">Course Prerequisite</label>
+                        <input type="text" class="form-control" id="course-prereq" asp-for = "NCoursePrereq">
+                    </div>
+                    <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message) ? "" : "display:none;")">@Model.Message</p>
                     <button type="submit" class="btn btn-primary">Add Course</button>
                 </form>
             </div>
@@ -85,76 +90,170 @@
 
         <!-- Available Courses Table -->
         <div class="card">
-            <div class="card-header">Available Courses</div>
+            <div class="card-header">Offered Courses</div>
             <div class="card-body">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Course ID</th>
-                        <th>Course Name</th>
                         <th>Course Code</th>
+                        <th>Course Name</th>
                         <th>Credit Hours</th>
+                        <th>Applications</th>
+                        <th>Semester</th>
                     </tr>
                 </thead>
                 <tbody>
+                @foreach (var course in Model.Courses)
+                {
                     <tr>
-                        <td>CSCI101</td>
-                        <td>Introduction to Computer Science</td>
-                        <td>CSCI101</td>
-                        <td>3</td>
+                        <td>@course.CourseCode</td>
+                        <td>@course.CourseName</td>
+                        <td>@course.CreditHours</td>
+                        <td>@course.Applications</td>
+                        <td>@course.Semester</td>
                     </tr>
-                    <tr>
-                        <td>MATH201</td>
-                        <td>Calculus I</td>
-                        <td>MATH201</td>
-                        <td>4</td>
-                    </tr>
-                    <!-- Add more rows for each available course -->
+                }
                 </tbody>
             </table>
             </div>
         </div>
 
+
+        <!-- Available Courses Table -->
         <div class="card">
-            <div class="card-header">Register Student</div>
+            <div class="card-header">All Courses</div>
             <div class="card-body">
-            <form>
-                <div class="form-group">
-                    <label for="studentID">Student ID:</label>
-                    <input type="text" class="form-control" id="studentID">
-                </div>
-                <div class="form-group">
-                    <label for="courseCode">Course Code:</label>
-                    <input type="text" class="form-control" id="courseCode">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Credit Hours</th>
+                        <th>Applications</th>
+                        <th>Offer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var course in Model.AllCourses)
+                {
+                    <tr>
+                        <td>@course.CourseCode</td>
+                        <td>@course.CourseName</td>
+                        <td>@course.CreditHours</td>
+                        <td>@course.Applications</td>
+                        <td>
+                            <form method="post" asp-page-handler="AddApplication">
+                                <input type="hidden" asp-for="CourseCode" value="@course.CourseCode" />
+                                <button type="submit" class="btn btn-primary">Add Application</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message2) ? "" : "display:none;")">@Model.Message2</p>
             </div>
         </div>
+
+
+        <!-- Approval Requests for Registration -->
         <div class="card">
-            <div class="card-header">Register Faculty for Course</div>
+            <div class="card-header">Registration Approval Requests</div>
             <div class="card-body">
-            <form>
-                <div class="form-group">
-                    <label for="courseSelect">Select a course:</label>
-                    <select class="form-control" id="courseSelect">
-                        <option>CSCI101 - Introduction to Computer Science</option>
-                        <option>MATH201 - Calculus I</option>
-                        <!-- Add more options for each available course -->
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="instructorSelect">Select an instructor:</label>
-                    <select class="form-control" id="instructorSelect">
-                        <option>John Smith</option>
-                        <option>Jane Doe</option>
-                        <!-- Add more options for each available instructor -->
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Course Code</th>
+                        <th>Semester</th>
+                        <th>Offer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var reg in Model.approvalRequests)
+                {
+                    <tr>
+                        <td>@reg.StudentID</td>
+                        <td>@reg.OffCourseID</td>
+                        <td>@reg.Semester</td>
+                        <td>
+                            <form method="post" asp-page-handler="ApproveRegistration">
+                                <input type="hidden" asp-for="RegistrationID" value="@reg.RegistrationID" />
+                                <input type="hidden" asp-for="OfficerEmail">
+                                <input type="hidden" asp-for="OfficerPassword" />
+                                <button type="submit" class="btn btn-primary">Approve</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message3) ? "" : "display:none;")">@Model.Message3</p>
             </div>
         </div>
+
+        <!--Section Making Table-->
+        <div class="card">
+            <div class="card-header">Make Sections</div>
+            <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Credit Hours</th>
+                        <th>Make Section</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var course in Model.Courses)
+                {
+                    <tr>
+                        <td>@course.CourseCode</td>
+                        <td>@course.CourseName</td>
+                        <td>@course.CreditHours</td>
+                        <td>
+                            <form method="post" asp-page-handler="FillSections">
+                                <input type="hidden" asp-for="FillCode" value="@course.CourseCode" />
+                                <button type="submit" class="btn btn-primary">Fill Sections</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header">Register Faculty for Section</div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="AssignFaculty">
+                    <div class="form-group">
+                        <label for="courseSelect">Select a course:</label>
+                        <select class="form-control" id="courseSelect" name="ACourse" asp-for="ACourse">
+                            @foreach (var course in Model.aCourses)
+                            {
+                                <option value="@course.SSID">@course.SSID - @course.OffCourseID</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="instructorSelect">Select an instructor:</label>
+                        <select class="form-control" id="instructorSelect" name="AFaculty" asp-for="AFaculty">
+                            @foreach (var faculty in Model.aFaculty)
+                            {
+                                <option value="@faculty.Username">@faculty.FName @faculty.LName</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message4) ? "" : "display:none;")">@Model.Message4</p>
+        </div>
+
 
         </body>
 
