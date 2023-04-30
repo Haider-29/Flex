@@ -9,6 +9,76 @@
 </head>
 <style>
 
+
+    // Some vars
+    $link-color: #f52e62;
+    $text-color: #3f517e;
+    $hr-color: rgba(0,0,0,0.35);
+    $hr-text-color: #453986;
+
+    $letter-spacing: .32em;
+
+    $background-color: #fff;
+
+    hr {
+        display: block;
+        margin: 50px 0 -15px;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        background-color: $hr-color;
+        + h2
+
+    {
+        display: inline-block;
+        position: relative;
+        left: 50%;
+        margin: 0;
+        padding: 5px 10px;
+        border: 1px solid $hr-text-color;
+        //box-shadow: inset 0 0 0 1px $hr-text-color;
+        transform: translateX(-50%);
+        color: $hr-text-color;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: $letter-spacing;
+        text-align: center;
+        text-transform: uppercase;
+        background-color: $background-color;
+        // Cancel out offset created by letterspacing &::first-letter
+
+    {
+        margin-left: $letter-spacing;
+    }
+
+    }
+    }
+
+    /* Alternative transform: translate */
+    hr + h2 {
+        border-width: 1px 0;
+        &::before, &::after
+
+    {
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: $hr-text-color;
+        content: '';
+    }
+
+    &::before {
+        left: 0;
+    }
+
+    &::after {
+        right: 0;
+    }
+
+    }
+    /**/
     body {
         background-color: #f8f9fa;
     }
@@ -27,10 +97,10 @@
         background-color: #fff;
     }
 
-        .table th {
+    .table th {
             background-color: #007bff;
             color: #fff;
-        }
+    }
 
     .table-striped tbody tr:nth-of-type(odd) {
         background-color: #f2f2f2;
@@ -47,12 +117,92 @@
         color: #495057;
         background-color: #fff;
         border-color: #80bdff;
-        box-shadow: 0 0 0 0.25
+        box-shadow: 0 0 0 0.25;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+        button:hover {
+            background-color: #0069d9;
+            cursor: pointer;
+        }
+
+    .modal-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    /* Style for the quiz form */
+    #quiz-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+        /* Style for the quiz form inputs */
+        #quiz-form input[type="text"],
+        #quiz-form input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        /* Style for the quiz form label */
+        #quiz-form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Style for the quiz form button */
+        #quiz-form button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+    /* Style for the quiz table */
+    #quiz-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        /* Style for the quiz table header */
+        #quiz-table th {
+            text-align: left;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+        }
+
+        /* Style for the quiz table cells */
+        #quiz-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+            /* Style for the quiz table cells in the first column */
+            #quiz-table td:first-child {
+                font-weight: bold;
+            }
+
 
 </style>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Set Marks Distribution</h1>
+        <h1 class="text-center mb-4">Faculty Interface</h1>
         <div class="card">
             <div class="card-body">
                 <div class="row mb-3">
@@ -130,23 +280,23 @@
                                                         <form>
                                                             <div class="form-group">
                                                                 <label for="sessional1">Sessional I:</label>
-                                                                <input type="range" class="form-range" min="0" max="100" id="sessional1">
+                                                                <input type="range" class="form-range" min="0" max="30" id="sessional1">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="assignment">Assignments:</label>
-                                                                <input type="range" class="form-range" min="0" max="100" id="assignment">
+                                                                <input type="range" class="form-range" min="0" max="15" id="assignment">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="quiz">Quizzes:</label>
-                                                                <input type="range" class="form-range" min="0" max="100" id="quiz">
+                                                                <input type="range" class="form-range" min="0" max="10" id="quiz">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="sessional2">Sessional II:</label>
-                                                                <input type="range" class="form-range" min="0" max="100" id="sessional2">
+                                                                <input type="range" class="form-range" min="0" max="30" id="sessional2">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="final">Final Exam:</label>
-                                                                <input type="range" class="form-range" min="0" max="100" id="final">
+                                                                <input type="range" class="form-range" min="0" max="60" id="final">
                                                             </div>
                                                         </form>
                                                     </div>
@@ -181,6 +331,249 @@
             </div>
         </div>
     </div>
+    <br />
+    <hr />
+    <!-- HTML table -->
+    <div class="container mt-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Section</th>
+                <th>Attendance Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr onclick="openModal('section1', '2023-04-30')">
+                <td>Section 1</td>
+                <td>2023-04-30</td>
+                <td><button>Edit Attendance</button></td>
+            </tr>
+            <tr onclick="openModal('section2', '2023-04-30')">
+                <td>Section 2</td>
+                <td>2023-04-30</td>
+                <td><button>Edit Attendance</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Bootstrap modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceModalLabel">Edit Attendance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" class="form-control" id="date">
+                        </div>
+                        <div class="form-group">
+                            <label for="creditHours">Credit Hours</label>
+                            <input type="number" class="form-control" id="creditHours" placeholder="Enter credit hours">
+                        </div>
+                        <hr>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Attendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Student 1</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="attendance1">
+                                            <label class="form-check-label" for="attendance1">
+                                                Present
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Student 2</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="attendance2">
+                                            <label class="form-check-label" for="attendance2">
+                                                Present
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Student 3</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="attendance3">
+                                            <label class="form-check-label" for="attendance3">
+                                                Present
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save Attendance</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            </div>
+
+
+    <br />
+    <hr />
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add Evaluation</h4>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="section-select" class="form-label">Select Section:</label>
+                        <select class="form-select" id="section-select">
+                            <option selected>Section 1</option>
+                            <option>Section 2</option>
+                            <option>Section 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluation-type-select" class="form-label">Select Evaluation Type:</label>
+                        <select class="form-select" id="evaluation-type-select">
+                            <option selected>Quiz</option>
+                            <option>Assignment</option>
+                            <option>Presentation</option>
+                            <option>Sessional 1</option>
+                            <option>Sessional 2</option>
+                            <option>Project</option>
+                            <option>Final Exam</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluation-name-input" class="form-label">Evaluation Name:</label>
+                        <input type="text" class="form-control" id="evaluation-name-input" placeholder="Enter name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="total-marks-input" class="form-label">Total Marks:</label>
+                        <input type="number" class="form-control" id="total-marks-input" placeholder="Enter total marks">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date-input" class="form-label">Date:</label>
+                        <input type="date" class="form-control" id="date-input">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Evaluation</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+        <br />
+    <hr />
+
+
+    <div class="container mt-5">
+
+  
+
+    <!-- Section Evaluation Marks -->
+    <div class="card">
+        <div class="card-header">
+            Section Evaluation Marks
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row mb-3">
+                    <label for="sectionSelect" class="col-sm-2 col-form-label">Select Section</label>
+                    <div class="col-sm-4">
+                        <select class="form-select" id="sectionSelect">
+                            <option selected disabled>Select Section</option>
+                            <option value="sec1">Section 1</option>
+                            <option value="sec2">Section 2</option>
+                            <option value="sec3">Section 3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="evalSelect" class="col-sm-2 col-form-label">Select Evaluation</label>
+                    <div class="col-sm-4">
+                        <select class="form-select" id="evalSelect">
+                            <option selected disabled>Select Evaluation</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="assignment">Assignment</option>
+                            <option value="sessional1">Sessional 1</option>
+                            <option value="sessional2">Sessional 2</option>
+                            <option value="project">Project</option>
+                            <option value="final">Final Exam</option>
+                            <option value="presentation">Presentation</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Marks Obtained</th>
+                            <th>Total Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Student 1</td>
+                            <td><input type="number" class="form-control" id="student1MarksObtained" placeholder="Marks Obtained"></td>
+                            <td><input type="number" class="form-control" id="student1TotalMarks" placeholder="Total Marks"></td>
+                        </tr>
+                        <tr>
+                            <td>Student 2</td>
+                            <td><input type="number" class="form-control" id="student2MarksObtained" placeholder="Marks Obtained"></td>
+                            <td><input type="number" class="form-control" id="student2TotalMarks" placeholder="Total Marks"></td>
+                        </tr>
+                        <tr>
+                            <td>Student 3</td>
+                            <td><input type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
+                            <td><input type="number" class="form-control" id="student3TotalMarks" placeholder="Total Marks"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Save Marks</button>
+            </form>
+        </div>
+    </div>
+
+    </div>
+
+
+    <!-- JavaScript function to open the modal -->
+    <script>
+        function openModal(section, date) {
+            // Set the modal title based on the section and date
+            const modalTitle = document.getElementById('attendanceModalLabel');
+            modalTitle.innerText = `Edit Attendance for ${section} on ${date}`;
+
+            // Clear any previous form data
+            const form = document.querySelector('#attendanceModal form');
+            form.reset();
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            modal.show();
+        }
+    </script>
+
 
 
 
