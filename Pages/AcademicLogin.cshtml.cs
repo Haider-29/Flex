@@ -44,8 +44,9 @@ namespace FLEXX.Pages
                     Message = "Login Successful!";
                     cmd.Dispose();
                     conn.Close();
-                    return RedirectToPage("/AcademicInterface");
+                    return RedirectToPage("/AcademicInterface", new { email = Email, password = Password });
                 }
+            
                 else
                 {
                     Message = "Invalid Information";
