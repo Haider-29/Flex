@@ -35,13 +35,15 @@ namespace FLEXX.Pages
             {
                 conn.Open();
                 SqlCommand cmd;
-                string query = "SELECT Username, Password FROM Users WHERE USERNAME = @Email AND Password = @Password and role = 'F'";
+                string query = "SELECT * FROM Users WHERE USERNAME = @Email AND Password = @Password and role = 'F'";
 
                 cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
                 cmd.Parameters.AddWithValue("@Password", Password);
 
                 SqlDataReader reader = cmd.ExecuteReader();
+
+                //Console.WriteLine(reader["FName"].ToString());
 
                 if (reader.HasRows)
                 {
