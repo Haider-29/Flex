@@ -404,6 +404,9 @@ namespace FLEXX.Pages
                     cmd.Parameters.AddWithValue("@NCoursePrereq", NCoursePrereq);
                 }
 
+                Console.WriteLine(NCreditHours);
+                Console.WriteLine(query);
+
                 try
                 {
                     int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -415,12 +418,14 @@ namespace FLEXX.Pages
                     {
                         // Insertion was successful
                         Message = "Course adding successful!";
+                        await OnGetAsync(OfficerEmail, OfficerPassword);
                         return Page(); // Redirect to login page or any other page you'd like
                     }
                     else
                     {
                         // Insertion failed
                         Message = "Course Registration Failed";
+                        await OnGetAsync(OfficerEmail, OfficerPassword);
                         return Page(); // Stay on the same page and show the error message
                     }
                 }
@@ -440,6 +445,7 @@ namespace FLEXX.Pages
                         Message = "An error occurred during registration. Please try again.";
                     }
 
+                    await OnGetAsync(OfficerEmail, OfficerPassword);
                     return Page(); // Stay on the same page and show the error message
                 }
             }
