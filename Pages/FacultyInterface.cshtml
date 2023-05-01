@@ -239,24 +239,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>CS101</td>
-                            <td><a href="#exampleModalCenter" data-toggle="modal">Introduction to Computer Science</a></td>
-                            <td>Section A</td>
-                            <td>Ibrahim</td>
-                        </tr>
-                        <tr>
-                            <td>CS201</td>
-                            <td><a href="#exampleModalCenter" data-toggle="modal">Data Structures and Algorithms</a></td>
-                            <td>Section B</td>
-                            <td>Ibrahim</td>
-                        </tr>
-                        <tr>
-                            <td>CS301</td>
-                            <td><a href="#exampleModalCenter" data-toggle="modal">Database Systems</a></td>
-                            <td>Section C</td>
-                            <td>Ibrahim</td>
-                        </tr>
+                           @foreach (var course in Model.AssignedSections)
+                                {
+                                    <tr>
+                                        <td>@course.CourseCode</td>
+                                        <td onclick="openCourseDistribution('@course.CourseTitle', '@course.SectionName')"><a href="#exampleModalCenter" data-toggle="modal">@course.CourseTitle</a></td>
+                                        <td>@course.SectionName</td>
+                                        <td>@course.TeacherName</td>
+                                    </tr>
+                                }
                     </tbody>
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -264,7 +255,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLongTitle">Set Marks Distributions</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
@@ -274,7 +265,7 @@
                                         <hr>
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title">Course Name - Section XYZ</h5>
+                                                <h5 class="card-title" id="courseDistribution">Course Name - Section XYZ</h5>
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <form>
@@ -321,7 +312,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="button" class="btn btn-primary">Save changes</button>
                                 </div>
                             </div>
@@ -339,21 +330,19 @@
         <thead>
             <tr>
                 <th>Section</th>
-                <th>Attendance Date</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr onclick="openModal('section1', '2023-04-30')">
-                <td>Section 1</td>
-                <td>2023-04-30</td>
-                <td><button>Edit Attendance</button></td>
-            </tr>
-            <tr onclick="openModal('section2', '2023-04-30')">
-                <td>Section 2</td>
-                <td>2023-04-30</td>
-                <td><button>Edit Attendance</button></td>
-            </tr>
+
+                @foreach (var course in Model.AssignedSections)
+                {
+                    <tr>
+                        <td onclick="openModal('@course.SectionName')">@course.SectionName</td>
+                        <td><button>Edit Attendance</button></td>
+                    </tr>
+                }
+  
         </tbody>
     </table>
 
@@ -595,10 +584,10 @@
 
     <!-- JavaScript function to open the modal -->
     <script>
-        function openModal(section, date) {
+        function openModal(section) {
             // Set the modal title based on the section and date
             const modalTitle = document.getElementById('attendanceModalLabel');
-            modalTitle.innerText = `Edit Attendance for ${section} on ${date}`;
+            modalTitle.innerText = `Edit Attendance for ${section}.`;
 
             // Clear any previous form data
             const form = document.querySelector('#attendanceModal form');
@@ -607,6 +596,22 @@
             // Show the modal
             const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
             modal.show();
+        }
+
+        function openCourseDistribution(course, section) {
+            const modalTitle = document.getElementById("courseDistribution");
+            modalTitle.innerText = `${course} - ${section}`;
+
+            // Clear any previous form data
+            const form = document.querySelector('#exampleModalCenter form');
+            form.reset();
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('exampleModalCenter'));
+            modal.show();
+
+
+
         }
     </script>
 

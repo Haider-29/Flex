@@ -50,7 +50,7 @@ namespace FLEXX.Pages
                     Message = "Login Successful!";
                     cmd.Dispose();
                     conn.Close();
-                    return RedirectToPage("/FacultyInterface");
+                    return RedirectToPage("/FacultyInterface", new { email = Email, password = Password });
                 }
                 else
                 {
