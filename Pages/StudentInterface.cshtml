@@ -3,83 +3,593 @@
 @{
 }
 
-<head>
-    <title>Student Portal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
-</head>
-<body>
-    <div class="tab">
-        <button class="tablinks" onclick="openCity(event, 'Home')">Home</button>
-        <button class="tablinks" onclick="openCity(event, 'Marks')">Marks</button>
-        <button class="tablinks" onclick="openCity(event, 'Attendance')">Attendance</button>
-    </div>
-
-    <div id="Home" class="tabcontent">
-        <h3>Home</h3>
-        <p>Student's Info</p>
-    </div>
-
-    <div id="Marks" class="tabcontent">
-        <h3>Marks</h3>
-        <p>Marks of Student</p>
-    </div>
-
-    <div id="Attendance" class="tabcontent">
-        <h3>Attendance</h3>
-        <p>Attendance of Student</p>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-</body>
-
-<style>
-    * {
-        box-sizing: border-box
-    }
-
-   /* .tab_header {
-        position: fixed
-    }*/
-    /* Style the tab */
-    .tab {
-        float: left;
-        /*border: 1px solid #ccc;*/
-        background-color: #000033;
-        width: 10%;
-        height: 1000px;
-    }
-
-        /* Style the buttons that are used to open the tab content */
-        .tab button {
-            display: block;
-            background-color: inherit;
-            color: white;
-            padding: 22px 16px;
-            width: 100%;
-            border: none;
-            outline: none;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-            /* Change background color of buttons on hover */
-            .tab button:hover {
-                background-color: #b3d1ff;
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
+        <title>Student Portal</title>
+        <style>
+            * {
+                box-sizing: border-box
             }
 
-            /* Create an active/current "tab button" class */
-            .tab button.active {
-                background-color: #ccc;
+            body {
+                /*font-family: "Lato", sans-serif;*/
+                background-color: #f8f9fa;
             }
 
-    /* Style the tab content */
-    .tabcontent {
-        float: left;
-        padding: 0px 12px;
-        border: 1px solid #ccc;
-        width: 70%;
-        border-left: none;
-        height: 300px;
-    }
-</style>
+            /* Style the tab */
+            .tab {
+                margin-top: 12%;
+                /*margin-right: 20px;*/
+                float: left;
+                border: none;
+                background-color: #2A363B;
+                width: 12%;
+                height: 70%;
+                position: fixed;
+                top: 0;
+                border-radius: 20px;
+                left: 10%;
+            }
+
+
+                /* Style the buttons inside the tab */
+                .tab button {
+                    border-radius: 20px;
+                    margin-top: 0%;
+                    display: block;
+                    background-color: inherit;
+                    color: white;
+                    padding: 22px 13px;
+                    width: 100%;
+                    border: none;
+                    outline: none;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    font-size: 17px;
+                }
+
+                    /* Change background color of buttons on hover */
+                    .tab button:hover {
+                        background-color: #282A3A;
+                    }
+
+                    /* Create an active/current "tab button" class */
+                    .tab button.active {
+                        background-color: #282A3A;
+                        color: #F7C402;
+                    }
+
+            /* Style the tab content */
+            .tabcontent {
+                margin-top: 20px;
+                float: left;
+                padding: 0px 20px;
+                border: none;
+                width: 70%;
+                border-left: none;
+                height: 95%;
+            }
+
+            .container {
+                margin-left: 200px;
+                text-align: center;
+            }
+
+            .form-title {
+                font-size: 24px;
+                font-weight: bold;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            .table-title {
+                font-size: 24px;
+                font-weight: bold;
+                margin-top: 50px;
+                margin-bottom: 20px;
+            }
+
+            .card {
+                margin-top: 30px;
+                text-align:left;
+            }
+
+            .card-header {
+                background-color: #3f51b5;
+                color: white;
+                font-weight: bold;
+            }
+
+            .btn-primary {
+                background-color: #3f51b5;
+                border-color: #3f51b5;
+                font-weight: bold;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <h1 style="margin-left: 10%"><b>Student Portal</b></h1>
+
+        <div class="tab">
+            <button class="tablinks" onclick="menu(event, 'Home')" id="defaultOpen">Home</button>
+            <button class="tablinks" onclick="menu(event, 'Marks')">Marks</button>
+            <button class="tablinks" onclick="menu(event, 'Attendance')">Attendance</button>
+            <button class="tablinks" onclick="menu(event, 'Transcript')">Transcript</button>
+            <button class="tablinks" onclick="menu(event, 'Apply for Course')">Apply for Course</button>
+            <button class="tablinks" onclick="menu(event, 'Course Registration')">Course Registration</button>
+            <button class="tablinks" onclick="menu(event, 'Feedback')">Feedback</button>
+        </div>
+
+        <div id="Home" class="tabcontent">
+            <div class="container">
+                <div class="card">
+                    <div class="card-header">University Information</div>
+                    <div class="card-body">
+                        <p>
+                            <b>Roll No.: </b> 21I-0406
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Student Information</div>
+                    <div class="card-body">
+                        <p>
+                            <b>Name: </b>Muhammad Raees Shujaan Azhar
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Parent's Information'</div>
+                    <div class="card-body">
+                        <p>
+                            <b>Guardian Name: </b>Muhammad Azhar Saeed
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Marks" class="tabcontent">
+            <div class="position-absolute" style="top: 20%; left: 42%;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <form class="form-example" action="" method="post">
+                        <div class="form-group">
+                            <label for="courseSelect">Select a course:</label>
+                            <select class="form-control" id="courseSelect">
+                                <option>CSCI101 - Introduction to Computer Science</option>
+                                <option>MATH201 - Calculus I</option>
+                                <!-- Add more options for each available course -->
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card" style="top: 130px; left: 28%; width: 120%">
+                <div class="card-header">CSCI101 - Introduction to Computer Science</div>
+                <div class="card-body">
+                    <ul class="nav nav-pills" style="margin-bottom: 3%">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="pill" href="#quiz">Quiz</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#assignments">Assignments</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#sesional1">Sessional I</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#sesional2">Sessional II</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#project">Project</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#final">Final Exam</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#total">Grand Total</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="quiz">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Quiz #</th>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                    <!-- Add more rows for each quiz-->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="assignments">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Assignment #</th>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                    <!-- Add more rows for each assignment-->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="sesional1">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="sesional2">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="project">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                    <!-- Add more rows for each project-->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="final">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Weightage</th>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>10</td>
+                                        <td>10</td>
+                                        <td>5</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>10</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="total">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Obtained Marks</th>
+                                        <th>Total Marks</th>
+                                        <th>Average</th>
+                                        <th>Standard Deviation</th>
+                                        <th>Minimum</th>
+                                        <th>Maximum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>100</td>
+                                        <td>100</td>
+                                        <td>50</td>
+                                        <td></td>
+                                        <td>0</td>
+                                        <td>100</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>   
+
+
+        <div id="Attendance" class="tabcontent">
+            <div class="position-absolute" style="top: 20%; left: 42%;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <form class="form-example" action="" method="post">
+                        <div class="form-group">
+                            <label for="courseSelect">Select a course:</label>
+                            <select class="form-control" id="courseSelect">
+                                <option>CSCI101 - Introduction to Computer Science</option>
+                                <option>MATH201 - Calculus I</option>
+                                <!-- Add more options for each available course -->
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card" style="top: 130px; left: 28%; width: 120%">
+                <div class="card-header">CSCI101 - Introduction to Computer Science</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Lecture No.</th>
+                                <th>Date</th>
+                                <th>Duration (In Hours)</th>
+                                <th>Presence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>14-Aug-1947</td>
+                                <td>1.5</td>
+                                <td>P</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="Transcript" class="tabcontent">
+            <div class="position-absolute" style="top: 20%; left: 48%;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <form class="form-example" action="" method="post">
+                        <div class="form-group">
+                            <label for="semSelect">Select the semester:</label>
+                            <select class="form-control" id="semSelect" style="text-align:center">
+                                <option>Fall 2021</option>
+                                <option>Spring 2022</option>
+                                <option>Summer 2022</option>
+                                <option>Fall 2022</option>
+                                <option>Spring 2023</option>
+                                <!-- Add more options for each semester -->
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="container" style="height: 5%; width: 60%; background-color: red; top: 30%"></div>
+            <div class="card" style="top: 130px; left: 28%; width: 120%">
+                <div class="card-header">Semester 1 (Fall 2021)</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Course Name</th>
+                                <th>Section</th>
+                                <th>CrdHrs</th>
+                                <th>Grade</th>
+                                <th>Points</th>
+                                <th>Type</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CSCI101</td>
+                                <td>Introduction to Computer Science</td>
+                                <td>BCS-G</td>
+                                <td>3</td>
+                                <td>A+</td>
+                                <td>4</td>
+                                <td>Core</td>
+                                <td></td>
+                            </tr>
+                        <!-- Add more rows for each course -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="Apply for Course" class="tabcontent">
+            <div class="container">
+            
+                <!-- Add New Course Form -->
+            <div class="card">
+                <div class="card-header">Apply for a Course</div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="courseSelect">Select a course:</label>
+                            <select class="form-control" id="courseSelect">
+                                <option>CSCI101 - Introduction to Computer Science</option>
+                                <option>MATH201 - Calculus I</option>
+                                <!-- Add more options for each available course -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+           
+        </div>
+
+        <div id="Course Registration" class="tabcontent">
+            <div class="container">
+                <!-- Available Courses Table -->
+                <div class="card">
+                    <div class="card-header">Offered Courses</div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Course ID</th>
+                                    <th>Course Name</th>
+                                    <th>Course Code</th>
+                                    <th>Credit Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CSCI101</td>
+                                    <td>Introduction to Computer Science</td>
+                                    <td>CSCI101</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>MATH201</td>
+                                    <td>Calculus I</td>
+                                    <td>MATH201</td>
+                                    <td>4</td>
+                                </tr>
+                                <!-- Add more rows for each available course -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Register for Offered Course</div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="courseSelect">Select a course:</label>
+                                <select class="form-control" id="courseSelect">
+                                    <option>CSCI101 - Introduction to Computer Science</option>
+                                    <option>MATH201 - Calculus I</option>
+                                    <!-- Add more options for each available course -->
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Feedback" class="tabcontent">
+            <h3>Feedback</h3>
+            <p>Feedback content</p>
+        </div>
+
+        <script>
+            function menu(evt, tabName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+
+            // Get the element with id="defaultOpen" and click on it
+            document.getElementById("defaultOpen").click();
+        </script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>
