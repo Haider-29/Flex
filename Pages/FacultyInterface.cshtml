@@ -1,4 +1,6 @@
 ﻿@page
+@using System.Text.Json;
+
 @model FLEXX.Pages.FacultyInterfaceModel
 @{
 }
@@ -198,6 +200,15 @@
                 font-weight: bold;
             }
 
+    .modal-backdrop {
+        display: none;
+    }
+
+    .modal-open {
+        overflow: hidden;
+    }
+
+
 
 </style>
 <body>
@@ -224,11 +235,12 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search">
-                            <button class="btn btn-primary" type="button">Search</button>
+                            <input id="searchInput" type="text" class="form-control" placeholder="Search">
+                            <button id="searchButton" class="btn btn-primary" type="button">Search</button>
                         </div>
                     </div>
                 </div>
+                <div class="container mt-5" id="coursesTable">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -250,7 +262,7 @@
                                 }
                     </tbody>
                     <!-- Modal -->
-                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="false">
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -319,6 +331,7 @@
                         </div>
                     </div>
                 </table>
+                </div>
             </div>
         </div>
     </div>
@@ -338,7 +351,7 @@
                 @foreach (var course in Model.AssignedSections)
                 {
                     <tr>
-                        <td onclick="openModal('@course.SectionName')">@course.SectionName</td>
+                        <td onclick="openModal('@course.SectionName', '@course.SectionName')">@course.SectionName</td>
                         <td><button>Edit Attendance</button></td>
                     </tr>
                 }
@@ -354,95 +367,59 @@
                     <h5 class="modal-title" id="attendanceModalLabel">Edit Attendance</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="date">Date</label>
-                            <input type="date" class="form-control" id="date">
-                        </div>
-                        <div class="form-group">
-                            <label for="creditHours">Credit Hours</label>
-                            <input type="number" class="form-control" id="creditHours" placeholder="Enter credit hours">
-                        </div>
-                        <hr>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Roll Number</th>
-                                    <th colspan="2">Attendance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Student 1</td>
+                    <div class="modal-body">
+                        <form method="post" asp-page-handler="AddAttendance">
+                            <div class="form-group">
+                                <label for="date">Date</label>
+                                <input type="date" class="form-control" id="date" name="date">
+                            </div>
+                            <div class="form-group">
+                                <label for="creditHours">Credit Hours</label>
+                                <input type="number" class="form-control" id="creditHours" name="creditHours" placeholder="Enter credit hours">
+                            </div>
+                            <hr>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Roll Number</th>
+                                        <th colspan="2">Attendance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in Model.Students)
+                                    {
+                                        <tr data-section="@student.section">
+                                            <td>@student.Name</td>
+                                            <td>@student.RollNum</td>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Present" id="attendance1" name="attendance[@student.RollNum]">
+                                                    <label class="form-check-label" for="attendance1">
+                                                        Present
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Late" id="attendance2" name="attendance[@student.RollNum]">
+                                                    <label class="form-check-label" for="attendance2">
+                                                        Late
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
 
-                                    <td>21i-0669</td>
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="attendance1">
-                                            <label class="form-check-label" for="attendance1">
-                                                Present
-                                            </label>
-                                        </div>
-                                    </td>
-                                        <td>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="attendance1">
-                                                <label class="form-check-label" for="attendance1">
-                                                    Late
-                                                </label>
-                                            </div>
-                                        </td>
-                                </tr>
-                                <tr>
-                                    <td>Student 2</td>
-                                        <td>21i-0500</td>
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="attendance2">
-                                            <label class="form-check-label" for="attendance2">
-                                                Present
-                                            </label>
-                                        </div>
-                                    </td>
-                                        <td>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="attendance1">
-                                                <label class="form-check-label" for="attendance1">
-                                                    Late
-                                                </label>
-                                            </div>
-                                        </td>
-                                </tr>
-                                <tr>
-                                    <td>Student 3</td>
-                                        <td>21i-0816</td>
-                                    <td>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="attendance3">
-                                            <label class="form-check-label" for="attendance3">
-                                                Present
-                                            </label>
-                                        </div>
-                                    </td>
-                                        <td>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="attendance1">
-                                                <label class="form-check-label" for="attendance1">
-                                                    Late
-                                                </label>
-                                            </div>
-                                        </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save Attendance</button>
-                </div>
+                                </tbody>
+                            </table>
+
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Attendance</button>
+                        </form>
+                    </div>
+              
+
             </div>
         </div>
     </div>
@@ -459,18 +436,21 @@
                 <h4>Add Evaluation</h4>
             </div>
             <div class="card-body">
-                <form>
+                <form method="post" asp-page-handler="AddEvaluation">
                     <div class="mb-3">
                         <label for="section-select" class="form-label">Select Section:</label>
-                        <select class="form-select" id="section-select">
-                            <option selected>Section 1</option>
-                            <option>Section 2</option>
-                            <option>Section 3</option>
+                        <select asp-for = "NSectionID" class="form-select" id="section-select">
+                            @foreach (var course in Model.AssignedSections)
+                            {
+                                <option>@course.SectionName</option>
+                            }
+                            
+                           
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="evaluation-type-select" class="form-label">Select Evaluation Type:</label>
-                        <select class="form-select" id="evaluation-type-select">
+                        <select asp-for="NEvaluationType" class="form-select" id="evaluation-type-select">
                             <option selected>Quiz</option>
                             <option>Assignment</option>
                             <option>Presentation</option>
@@ -483,13 +463,20 @@
 
                     <div class="mb-3">
                         <label for="total-marks-input" class="form-label">Total Marks:</label>
-                        <input type="number" class="form-control" id="total-marks-input" placeholder="Enter total marks">
+                        <input type="number" class="form-control" id="total-marks-input" asp-for="NMaxMarks" placeholder="Enter total marks">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="total-marks-input" class="form-label">Weightage:</label>
+                        <input type="number" class="form-control" id="total-marks-input" asp-for = "NWeightage" placeholder="Enter weightage">
                     </div>
 
                     <div class="mb-3">
                         <label for="date-input" class="form-label">Date:</label>
                         <input type="date" class="form-control" id="date-input">
                     </div>
+                    <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message) ? "" : "display:none;")">@Model.Message</p>
+
                     <button type="submit" class="btn btn-primary">Add Evaluation</button>
                 </form>
             </div>
@@ -515,11 +502,12 @@
                 <div class="row mb-3">
                     <label for="sectionSelect" class="col-sm-2 col-form-label">Select Section</label>
                     <div class="col-sm-4">
-                        <select class="form-select" id="sectionSelect">
-                            <option selected disabled>Select Section</option>
-                            <option value="sec1">Section 1</option>
-                            <option value="sec2">Section 2</option>
-                            <option value="sec3">Section 3</option>
+                            <select asp-for="NSectionID" class="form-select" id="section-select" onchange="filterStudents()">
+
+                                @foreach (var course in Model.AssignedSections)
+                                {
+                                    <option>@course.SectionName</option>
+                                }
                         </select>
                     </div>
                 </div>
@@ -554,24 +542,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Student 1</td>
-                                <td>21i-0669</td>
-                            <td><input type="number" class="form-control" id="student1MarksObtained" placeholder="Marks Obtained"></td>
-                            <td><input type="number" class="form-control" id="student1TotalMarks" placeholder="Total Marks"></td>
-                        </tr>
-                        <tr>
-                            <td>Student 2</td>
-                                <td>21i-0500</td>
-                            <td><input type="number" class="form-control" id="student2MarksObtained" placeholder="Marks Obtained"></td>
-                            <td><input type="number" class="form-control" id="student2TotalMarks" placeholder="Total Marks"></td>
-                        </tr>
-                        <tr>
-                            <td>Student 3</td>
-                                <td>20i-0816</td>
-                            <td><input type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
-                            <td><input type="number" class="form-control" id="student3TotalMarks" placeholder="Total Marks"></td>
-                        </tr>
+                            @foreach (var student in Model.Students)
+                            {
+                                <tr>
+                                    <td>@student.Name</td>
+                                    <td>@student.RollNum</td>
+                                    <td><input type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
+                                    <td><input type="number" class="form-control" id="student3TotalMarks" placeholder="Total Marks"></td>
+                                    
+                                </tr>
+                            }
+
                     </tbody>
                 </table>
                 <button type="submit" class="btn btn-primary">Save Marks</button>
@@ -584,7 +565,7 @@
 
     <!-- JavaScript function to open the modal -->
     <script>
-        function openModal(section) {
+        function openModal(section, sectionId) {
             // Set the modal title based on the section and date
             const modalTitle = document.getElementById('attendanceModalLabel');
             modalTitle.innerText = `Edit Attendance for ${section}.`;
@@ -597,6 +578,8 @@
             const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
             modal.show();
         }
+
+
 
         function openCourseDistribution(course, section) {
             const modalTitle = document.getElementById("courseDistribution");
@@ -613,6 +596,83 @@
 
 
         }
+
+        function filterStudents(sectionId) {
+            // Get all the student rows in the attendance modal
+            const studentRows = document.querySelectorAll('#attendanceModal tbody tr');
+
+            // Iterate through the student rows and hide/show them based on their section
+            studentRows.forEach(row => {
+                const studentSection = row.getAttribute('data-section');
+                if (studentSection === sectionId) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const selectedSection = document.getElementById("section-select").value;
+            const students = Model.Students;
+            const filteredStudents = students.filter(student => student.section === selectedSection);
+
+            const studentTbody = document.querySelector("table.table-bordered tbody");
+            studentTbody.innerHTML = "";
+
+            filteredStudents.forEach(student => {
+                const row = `
+                    <tr>
+                        <td>${student.Name}</td>
+                        <td>${student.RollNum}</td>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Present" id="attendance1" name="attendance[${student.RollNum}]">
+                                <label class="form-check-label" for="attendance1">
+                                    Present
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Late" id="attendance2" name="attendance[${student.RollNum}]">
+                                <label class="form-check-label" for="attendance2">
+                                    Late
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                studentTbody.innerHTML += row;
+            });
+        }
+
+        function filterCourses() {
+            const searchInput = document.getElementById('searchInput');
+            const searchText = searchInput.value.toLowerCase();
+            const coursesTable = document.getElementById('coursesTable');
+            const courseRows = coursesTable.querySelectorAll('table tbody tr');
+
+            courseRows.forEach(row => {
+                const courseTitle = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+                if (courseTitle.includes(searchText)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+
+        document.getElementById('searchButton').addEventListener('click', filterCourses);
+
+        const Model = {
+            Students: @Html.Raw(Json.Serialize(Model.Students)),
+            AssignedSections: @Html.Raw(Json.Serialize(Model.AssignedSections))
+
+        };
+
+
+
+
     </script>
 
 
