@@ -348,10 +348,10 @@
         </thead>
         <tbody>
 
-                @foreach (var course in Model.AssignedSections)
+                @foreach (var assigned in Model.AssignedSections)
                 {
                     <tr>
-                        <td onclick="openModal('@course.SectionName', '@course.SectionName')">@course.SectionName</td>
+                        <td onclick="openModal('@assigned.SectionName', '@assigned.SectionName')">@assigned.SectionName</td>
                         <td><button>Edit Attendance</button></td>
                     </tr>
                 }
@@ -565,7 +565,7 @@
                                     <tr>
                                         <td>@student.Name</td>
                                         <td>@student.RollNum</td>
-                                        <td><input asp-for="@Model.StudentMarks[@counter2].MarksObtained" type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
+                                        <td><input asp-for="@currentMark" type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
                                     </tr>
                                     counter2++;
                                 }
