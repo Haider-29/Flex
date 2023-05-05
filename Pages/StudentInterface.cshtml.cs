@@ -24,7 +24,7 @@ namespace FLEXX.Pages
             public string Semester { get; set; }
 
         }
-        public List<Student> Students { get; set; }
+        public Student currStudent { get; set; }
 
         [BindProperty]
         public string StudentId { get; set; }
@@ -54,6 +54,21 @@ namespace FLEXX.Pages
                         Name = reader.GetString(0) + " " + reader.GetString(1)
                     };
                      
+                    currStudent = student;
+                }
+
+                reader.Close();
+                cmd.Dispose();
+
+                query = "select semester from registration where studentid = @StudentId";
+                SqlCommand cmd2 = new SqlCommand(query, conn);
+                cmd2.Parameters.AddWithValue("@StudentId", StudentId);
+
+                reader = await cmd2.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    currStudent.Semester = reader.GetString(0);
                 }
 
                 reader.Close();
