@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <title>Student Portal</title>
         <style>
             * {
@@ -188,9 +188,10 @@
                         <div class="form-group">
                             <label for="courseSelect">Select a course:</label>
                             <select class="form-control" id="courseSelect">
-                                <option>CSCI101 - Introduction to Computer Science</option>
-                                <option>MATH201 - Calculus I</option>
-                                <!-- Add more options for each available course -->
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <option value="@course.courseID">@course.courseID - @course.courseName</option>
+                                }
                             </select>
                         </div>
                     </form>
@@ -414,54 +415,68 @@
                     </div>
                 </div>
             </div>
-        </div>   
+        </div>
 
 
-        <div id="Attendance" class="tabcontent">
-            <div class="position-absolute" style="top: 20%; left: 42%;">
-                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <form class="form-example" action="" method="post">
-                        <div class="form-group">
-                            <label for="courseSelect">Select a course:</label>
-                            <select class="form-control" id="courseSelect">
-                                <option>CSCI101 - Introduction to Computer Science</option>
-                                <option>MATH201 - Calculus I</option>
-                                <!-- Add more options for each available course -->
-                            </select>
-                        </div>
-                    </form>
-                </div>
+    <div id="Attendance" class="tabcontent">
+        <div class="position-absolute" style="top: 20%; left: 42%;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <form class="form-example" action="" method="post">
+                    <div class="form-group">
+                        <label for="courseSelect">Select a course:</label>
+                        <select class="form-control" id="courseSelect">
+                            @foreach (var course in Model.Courses)
+                            {
+                                <option value="@course.courseID">@course.courseID - @course.courseName</option>
+                            }
+                        </select>
+                    </div>
+                </form>
             </div>
+        </div>
         <div style="position: relative;">
             <div class="progress" style="position: absolute; top: 110px; left: 117%; width: 30%">
                 <div class="progress-bar bg-success" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
             </div>
         </div>
-
-            <div class="card" style="top: 130px; left: 28%; width: 120%">
-                <div class="card-header">CSCI101 - Introduction to Computer Science</div>
-                <div class="card-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Lecture No.</th>
-                                <th>Date</th>
-                                <th>Duration (In Hours)</th>
-                                <th>Presence</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>14-Aug-1947</td>
-                                <td>1.5</td>
-                                <td>P</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="card" style="top: 130px; left: 28%; width: 120%">
+            <div class="card-header" id="courseHeader"></div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Lecture No.</th>
+                            <th>Date</th>
+                            <th>Duration (In Hours)</th>
+                            <th>Presence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>14-Aug-1947</td>
+                            <td>1.5</td>
+                            <td>P</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var courseSelect = document.getElementById("courseSelect");
+            courseSelect.dispatchEvent(new Event("change"));
+        });
+
+        document.getElementById("courseSelect").addEventListener("change", function () {
+            var selectedCourse = this.options[this.selectedIndex].text;
+            document.getElementById("courseHeader").innerText = selectedCourse;
+        });
+    </script>
+
+
+
 
         <div id="Transcript" class="tabcontent">
             <div class="position-absolute" style="top: 20%; left: 48%;">
@@ -924,6 +939,8 @@
                 }
             });
         </script>
+   
+
 
     </body>
 </html>

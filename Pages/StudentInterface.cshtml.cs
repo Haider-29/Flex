@@ -24,6 +24,15 @@ namespace FLEXX.Pages
             public string Semester { get; set; }
 
         }
+
+        public class Course
+        {
+            public string courseID { get; set; }
+            public string courseName { get; set; }
+            public string courseHours { get; set; }
+        }
+
+        public List<Course> Courses { get; set; }
         public Student currStudent { get; set; }
 
         [BindProperty]
@@ -66,13 +75,39 @@ namespace FLEXX.Pages
 
                 reader = await cmd2.ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync()) 
                 {
                     currStudent.Semester = reader.GetString(0);
                 }
 
                 reader.Close();
-                cmd.Dispose();
+                cmd2.Dispose();
+
+                query = "select coursecode, courseName, creditHours from course c join registration r on c.coursecode = r.offcourseid where studentid = @StudentId";
+                SqlCommand cmd3 = new SqlCommand(query, conn);
+                cmd3.Parameters.AddWithValue("@StudentId", StudentId);
+
+                reader = await cmd3.ExecuteReaderAsync();
+
+                Courses = new List<Course>();
+                
+                while (await reader.ReadAsync())
+                {
+                    Course course = new Course()
+                    {
+                        courseID = reader.GetString(0),
+                        courseName = reader.GetString(1),
+                        courseHours = reader.GetInt32(2).ToString()
+                    };
+
+                    Courses.Add(course);
+                }
+
+                reader.Close();
+                cmd3.Dispose();
+
+
+                //conn.Close();
             }
                 
         }
