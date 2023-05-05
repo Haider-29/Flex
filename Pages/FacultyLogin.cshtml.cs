@@ -48,9 +48,13 @@ namespace FLEXX.Pages
                 if (reader.HasRows)
                 {
                     Message = "Login Successful!";
+
+                    HttpContext.Session.SetString("UserName", Email);
+
+
                     cmd.Dispose();
                     conn.Close();
-                    return RedirectToPage("/FacultyInterface");
+                    return RedirectToPage("/FacultyInterface", new { email = Email, password = Password });
                 }
                 else
                 {
