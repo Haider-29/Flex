@@ -38,6 +38,9 @@ namespace FLEXX.Pages
         public string? Section { get; set;}
         public DateTime? Date { get; set;}
         public string? Status { get; set;}
+
+        public string? course_id { get; set;}
+        public int? credit_hours { get; set;}
     }
 
 
@@ -75,6 +78,13 @@ namespace FLEXX.Pages
 
         [BindProperty]
         public DateTime Date { get; set; }
+
+        [BindProperty]
+        public int credit_hours { get; set; }
+
+        [BindProperty]
+
+        public string attendanceCourseID { get; set; }
 
         [BindProperty]
         public string[] StudentIds { get; set; }
@@ -316,6 +326,9 @@ namespace FLEXX.Pages
             DateTime date = Date;
             string[] statuses = Statuses;
 
+            string attendance_course_id = attendanceCourseID;
+            int attCredit = credit_hours;
+
 
             Console.Write("Student ids: ", studentIds);
             Console.Write("Sextion Id: ", sectionId);
@@ -353,8 +366,8 @@ namespace FLEXX.Pages
                 cmd.Dispose();
 
                 // insert attendance records
-                string query = "INSERT INTO Attendance (AttendanceID, StudentID, SectionID, Date, Status) " +
-                "VALUES (@AttendanceID, @StudentID, @SectionID, @Date, @Status)";
+                string query = "INSERT INTO Attendance (AttendanceID, StudentID, CourseID, SectionID, CreditHours, Date, Status) " +
+                "VALUES (@AttendanceID, @StudentID, @CourseID, @SectionID, @CreditHours, @Date, @Status)";
                 SqlCommand cmd2 = new SqlCommand(query, connection);
 
                 for (int i = 0; i < studentIds.Length; i++)
@@ -362,7 +375,10 @@ namespace FLEXX.Pages
                     cmd2.Parameters.Clear();
                     cmd2.Parameters.AddWithValue("@AttendanceID", attendanceID);
                     cmd2.Parameters.AddWithValue("@StudentID", studentIds[i]);
+                    cmd2.Parameters.AddWithValue("@CourseID", attendance_course_id);
+                    
                     cmd2.Parameters.AddWithValue("@SectionID", sectionId);
+                    cmd2.Parameters.AddWithValue("@CreditHours", attCredit);
                     cmd2.Parameters.AddWithValue("@Date", date);
                     cmd2.Parameters.AddWithValue("@Status", statuses[i]);
 

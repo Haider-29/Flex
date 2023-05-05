@@ -23,7 +23,18 @@ namespace FLEXX.Pages
             public string Name { get; set; }
             public string Semester { get; set; }
 
+            public string section { get; set; }
+
         }
+
+
+        public class Attendance {
+            
+            public string Date { get; set; }
+
+            public string Status { get; set; }
+        }
+
         public Student currStudent { get; set; }
 
         [BindProperty]
@@ -72,7 +83,22 @@ namespace FLEXX.Pages
                 }
 
                 reader.Close();
-                cmd.Dispose();
+                cmd2.Dispose();
+
+                query = "select sectionid from student_section where STUDENTID = @StudentId";
+                SqlCommand cmd3 = new SqlCommand(query, conn);
+                cmd3.Parameters.AddWithValue("@StudentId", StudentId);
+                reader = await cmd3.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    currStudent.section = reader.GetString(0);
+                }
+                reader.Close();
+                cmd3.Dispose();
+
+
+
+
             }
                 
         }

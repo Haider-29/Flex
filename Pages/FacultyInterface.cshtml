@@ -215,6 +215,9 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">Faculty Interface</h1>
         <div class="card">
+            <div class="card-header">
+                <h4>Assigned Courses</h4>
+            </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-sm-4">
@@ -339,10 +342,16 @@
     <hr />
     <!-- HTML table -->
     <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4>Attendance</h4>
+            </div>
+            <div class="card-body">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Section</th>
+                <th>Course</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -351,14 +360,17 @@
                 @foreach (var assigned in Model.AssignedSections)
                 {
                     <tr>
-                        <td onclick="openModal('@assigned.SectionName', '@assigned.SectionName')">@assigned.SectionName</td>
-                        <td><button>Edit Attendance</button></td>
+                        <td onclick="openModal('@assigned.SectionName', '@assigned.SectionName', '@assigned.CourseCode')">@assigned.SectionName</td>
+                        <td onclick="openModal('@assigned.SectionName', '@assigned.SectionName', '@assigned.CourseCode')">@assigned.CourseCode</td>
+                        <td onclick="openModal('@assigned.SectionName', '@assigned.SectionName', '@assigned.CourseCode')"><button>Edit Attendance</button></td>
                     </tr>
                 }
 
   
         </tbody>
     </table>
+</div>
+</div>
 
     <!-- Bootstrap modal -->
     <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
@@ -370,6 +382,7 @@
                 </div>
                     <div class="modal-body">
                         <form method="post" asp-page-handler="AddAttendance">
+                                <input type="hidden" asp-for="attendanceCourseID" id="attendanceCourseID" />
                             <div class="form-group">
                                 <label for="date">Date</label>
                                 <input type="date" class="form-control" id="Date" name="date" asp-for="Date">
@@ -378,7 +391,7 @@
 
                             <div class="form-group">
                                 <label for="creditHours">Credit Hours</label>
-                                <input type="number" class="form-control" id="creditHours" name="creditHours" placeholder="Enter credit hours">
+                                <input type="number" asp-for="credit_hours" class="form-control" id="creditHours" name="creditHours" placeholder="Enter credit hours">
                             </div>
                             <hr>
                             <table class="table table-bordered">
@@ -386,7 +399,7 @@
                                     <tr>
                                         <th>Student Name</th>
                                         <th>Roll Number</th>
-                                        <th colspan="2">Attendance</th>
+                                        <th colspan="3">Attendance</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -413,6 +426,14 @@
                                                     <input class="form-check-input" type="checkbox" value="Late" id="attendance2" name="@($"Statuses[{counter}]")">
                                                     <label class="form-check-label" for="attendance2">
                                                         Late
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="Absent" id="attendance1" name="@($"Statuses[{counter}]")">
+                                                    <label class="form-check-label" for="attendance1">
+                                                        Absent
                                                     </label>
                                                 </div>
                                             </td>
@@ -510,7 +531,7 @@
     <!-- Section Evaluation Marks -->
     <div class="card">
         <div class="card-header">
-            Section Evaluation Marks
+                <h4>Section Evaluation Marks</h4>
         </div>
         <div class="card-body">
                 <form method="post" asp-page-handler="SaveSectionEvaluation">
@@ -587,10 +608,12 @@
 
     <!-- JavaScript function to open the modal -->
     <script>
-        function openModal(section, sectionId) {
+        function openModal(section, sectionId, course) {
             // Set the modal title based on the section and date
             const modalTitle = document.getElementById('attendanceModalLabel');
-            modalTitle.innerText = `Edit Attendance for ${section}.`;
+            modalTitle.innerText = `Edit Attendance for ${section}, Course: ${course}.`;
+            document.getElementById("attendanceCourseID").value = course;
+
 
             // Set the hidden input's value to the sectionId
             const hiddenSectionId = document.getElementById('hiddenSectionId');
