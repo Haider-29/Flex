@@ -4,6 +4,7 @@ using System;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 
 namespace FLEXX.Pages
 {
@@ -50,13 +51,39 @@ namespace FLEXX.Pages
         public FacultyInterfaceModel(IConfiguration configuration)
         {
             _configuration = configuration;
+            AssignedSections = new List<MarksDistributionTable>();
+            Students = new List<Student>();
+        }
+
+        public class StudentMark
+        {
+            public int MarksObtained { get; set; }
+            public int TotalMarks { get; set; }
         }
 
         [BindProperty]
 
         public string Message { get; set; }
+        [BindProperty]
+        public string SelectedEvaluationType { get; set; }
+        [BindProperty]
+        public int NEvaluationNumber { get; set; }
+        [BindProperty]
+        public List<StudentMark> StudentMarks { get; set; }
 
         public List<MarksDistributionTable> AssignedSections { get; set; }
+
+        [BindProperty]
+        public DateTime Date { get; set; }
+
+        [BindProperty]
+        public string[] StudentIds { get; set; }
+
+        [BindProperty]
+        public string[] Statuses { get; set; }
+
+        [BindProperty]
+        public string SectionId { get; set; }
 
         public List<Student> Students { get; set; }
         [BindProperty]
@@ -81,6 +108,11 @@ namespace FLEXX.Pages
         public Int32 NWeightage { get; set; }
 
 
+        [BindProperty]
+
+        public string SaveMarksMessage { get; set; }
+
+
 
         [BindProperty]
 
@@ -88,6 +120,9 @@ namespace FLEXX.Pages
 
         public async Task<IActionResult> OnPostAddEvaluationAsync()
         {
+
+            string[] studentIds = StudentIds;
+            string sectionId = SectionId;
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (SqlConnection connection = new SqlConnection(connectionString)) { 
             
@@ -112,11 +147,12 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd.Dispose();
 
-                string query = "Insert into Evaluation (EvaluationID, SectionID, EvaluationType, Weightage, MaxMarks) " +
-                    "VALUES (@EvaluationID, @NSectionID, @NEvaluationType, @NWeightage, @NMaxMarks);";
+                string query = "Insert into Evaluation (EvaluationID, SectionID, EvaluationType, EvaluationNumber, Weightage, MaxMarks) " +
+                    "VALUES (@EvaluationID, @NSectionID, @NEvaluationType, @NEvaluationNumber, @NWeightage, @NMaxMarks);";
                 SqlCommand insertEvaluation = new SqlCommand(query, connection);
                 insertEvaluation.Parameters.AddWithValue("@NsectionID", NSectionID);
                 insertEvaluation.Parameters.AddWithValue("@NEvaluationType", NEvaluationType);
+                insertEvaluation.Parameters.AddWithValue("@NEvaluationNumber", NEvaluationNumber);
                 insertEvaluation.Parameters.AddWithValue("@NWeightage", NWeightage);
                 insertEvaluation.Parameters.AddWithValue("@NMaxMarks", NMaxMarks);
                 insertEvaluation.Parameters.AddWithValue("@EvaluationID", evaluationID);
@@ -148,8 +184,146 @@ namespace FLEXX.Pages
             }
         }
 
-        public async Task<IActionResult> OnPostAddAttendanceAsync(string[] studentIds, string sectionId, DateTime date, string[] statuses)
+
+        public async Task<IActionResult> OnPostSaveSectionEvaluationAsync()
         {
+            // You need to get the necessary input data from the form
+            string[] studentIds = StudentIds;
+            string sectionId = NSectionID;
+            string evaluationType = SelectedEvaluationType;
+            int evaluationNumber = NEvaluationNumber;
+            List<StudentMark> studentMarks = StudentMarks;
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                // Get the EvaluationID based on the sectionId, evaluationType, and evaluationNumber
+                string getEvaluationIdQuery = "SELECT EvaluationID FROM Evaluation WHERE SectionID = @SectionID AND EvaluationType = @EvaluationType AND EvaluationNumber = @EvaluationNumber";
+                SqlCommand getEvaluationIdCmd = new SqlCommand(getEvaluationIdQuery, connection);
+                getEvaluationIdCmd.Parameters.AddWithValue("@SectionID", NSectionID);
+                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationType", SelectedEvaluationType);
+                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationNumber", NEvaluationNumber);
+                Console.Write(getEvaluationIdCmd.ToString());
+
+                int evaluationId = 0;
+                SqlDataReader reader = await getEvaluationIdCmd.ExecuteReaderAsync();
+                
+                    if (reader.HasRows)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            evaluationId = reader.GetInt32(0);
+                            break;
+                        }
+                    }
+                reader.Close();
+                getEvaluationIdCmd.Dispose();
+
+                if (evaluationId == 0)
+                {
+                    Console.Write(evaluationId);
+                    SaveMarksMessage = "Failed to find the EvaluationID. Please check the input data.";
+                    await OnGetAsync(TeacherEmail, TeacherPassword);
+                    return Page();
+                }
+
+
+
+
+                Console.Write(evaluationId);
+        // insert marks records
+        string query = "INSERT INTO Marks (MarksID, StudentID, EvaluationID, EvaluationType, Score) " +
+        "VALUES (@MarksID, @StudentID, @EvaluationID, @EvaluationType, @Score)";
+                SqlCommand cmd = new SqlCommand(query, connection);
+
+                for (int i = 0; i < studentIds.Length; i++)
+                {
+
+                    Console.Write("OK");
+                    string generateID = "Select TOP 1 MarksID from Marks ORDER BY MarksID desc";
+                    SqlCommand idcommand = new SqlCommand(generateID, connection);
+                    SqlDataReader idReader = await idcommand.ExecuteReaderAsync();
+                    int marksID = 1;
+
+                    if (idReader.HasRows)
+                    {
+                        while (await idReader.ReadAsync())
+                        {
+                            marksID = idReader.GetInt32(0) + 1;
+                            break;
+                        }
+                    }
+
+                    idReader.Close();
+                    idcommand.Dispose();
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@MarksID", marksID); // Generate a unique ID for the Marks record
+                    cmd.Parameters.AddWithValue("@StudentID", StudentIds[i]);
+                    cmd.Parameters.AddWithValue("@EvaluationType", SelectedEvaluationType);
+                    cmd.Parameters.AddWithValue("@EvaluationID", evaluationId);
+                    cmd.Parameters.AddWithValue("@Score", StudentMarks[i].MarksObtained);
+
+                    try
+                    {
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if (rowsAffected <= 0)
+                        {
+                            // Insertion failed
+                            SaveMarksMessage = "Failed to save the marks for one or more students.";
+
+                        }
+                        else
+                        {
+                            SaveMarksMessage = "Marks saved!";
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == 2627)
+                        {
+                            // Primary key violation (duplicate record)
+                            SaveMarksMessage = "The marks record already exists.";
+                        }
+                        else
+                        {
+                            // Other SQL errors
+                            SaveMarksMessage = "An error occurred while saving the marks. Please try again.";
+                        }
+
+   
+
+                    }
+                }
+
+                cmd.Dispose();
+                connection.Close();
+            }
+
+            // Refresh the page and show the message
+            await OnGetAsync(TeacherEmail, TeacherPassword);
+            return Page();
+        }
+
+
+        public async Task<IActionResult> OnPostAddAttendanceAsync()
+        {
+
+            string[] studentIds = StudentIds;
+            string sectionId = SectionId;
+            DateTime date = Date;
+            string[] statuses = Statuses;
+
+
+            Console.Write("Student ids: ", studentIds);
+            Console.Write("Sextion Id: ", sectionId);
+            Console.Write("Date: ", date);
+            Console.Write("Statuses: ", statuses);
+
+
+
 
 
             Console.Write("Section: ", sectionId);
@@ -196,29 +370,15 @@ namespace FLEXX.Pages
                     {
                         int rowsAffected = await cmd2.ExecuteNonQueryAsync();
 
-                        cmd2.Dispose();
-                        connection.Close();
-
-                        if (rowsAffected > 0)
-                        {
-                            // Insertion was successful
-                            Message = "Attendance adding successful!";
-                            await OnGetAsync(TeacherEmail, TeacherPassword);
-                            return Page(); // Redirect to login page or any other page you'd like
-                        }
-                        else
+                        if (rowsAffected <= 0)
                         {
                             // Insertion failed
                             Message = "Attendance Adding Failed";
-                            await OnGetAsync(TeacherEmail, TeacherPassword);
-                            return Page(); // Stay on the same page and show the error message
+                            break;
                         }
                     }
                     catch (SqlException ex)
                     {
-                        cmd2.Dispose();
-                        connection.Close();
-
                         if (ex.Number == 2627)
                         {
                             // Primary key violation (duplicate email)
@@ -230,24 +390,49 @@ namespace FLEXX.Pages
                             Message = "An error occurred during registration. Please try again.";
                         }
 
-                        await OnGetAsync(TeacherEmail, TeacherPassword);
-                        return Page(); // Stay on the same page and show the error message
+                        break;
                     }
 
+                    attendanceID++; // Increment attendanceID for the next record
                 }
+
+                cmd2.Dispose();
+                connection.Close();
+
+                // Refresh the page and show the message
+
+
+
+            
             }
+
             await OnGetAsync(TeacherEmail, TeacherPassword);
             return Page();
+
         }
 
 
 
-
+        [HttpGet]
         public async Task OnGetAsync(string email, string password)
         {
 
+
+            string[] studentIds = StudentIds;
+            string sectionId = NSectionID;
+            string evaluationType = SelectedEvaluationType;
+            int evaluationNumber = NEvaluationNumber;
+            List<StudentMark> studentMarks = StudentMarks;
+
+
+
             TeacherEmail = email;
             TeacherPassword = password;
+
+                     
+           TeacherEmail = HttpContext.Session.GetString("UserName");
+
+
             Console.Write(TeacherEmail);
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
             
@@ -305,7 +490,7 @@ namespace FLEXX.Pages
                         SectionName = reader.GetString(0),
                         CourseTitle = course_name
 
-
+                            
 
                     };
 
@@ -315,6 +500,9 @@ namespace FLEXX.Pages
                     AssignedSections.Add(table);
 
                 }
+
+
+                Console.Write("Assigned Section:", AssignedSections);
 
                 reader.Close();
                 cmd.Dispose();
@@ -335,9 +523,15 @@ namespace FLEXX.Pages
                     };
                     Students.Add(student);
                 }
+
+                Console.Write("Students: ", Students);
+                StudentIds = new string[Students.Count];
+
                 // get students of a sections
                 readStudents.Close();
                 cum.Dispose();
+
+
                 connection.Close();
             }
 
