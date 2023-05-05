@@ -153,7 +153,8 @@
                     <div class="card-body">
                         <p>
                             <b>Roll No.: </b> @Model.StudentId
-                            <b>Semester: </b>
+                            <br>
+                            <b>Semester: </b> @Model.currStudent.Semester
                         </p>
                     </div>
                 </div>
@@ -162,20 +163,9 @@
                     <div class="card-header">Student Information</div>
                     <div class="card-body">
                         <p>
-                            @foreach (var student in Model.Students)
-                            {
-                            <b>Name: </b> @student.Name
-                            }
                             
-                        </p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">Parent's Information'</div>
-                    <div class="card-body">
-                        <p>
-                            <b>Guardian Name: </b>Muhammad Azhar Saeed
+                            <b>Name: </b> @Model.currStudent.Name
+                            
                         </p>
                     </div>
                 </div>
