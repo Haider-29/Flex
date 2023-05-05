@@ -1,12 +1,65 @@
+using System;
+using System.Data.SqlClient;
+using System.IO;
+using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace FLEXX.Pages
 {
     public class StudentInterfaceModel : PageModel
     {
-        public void OnGet()
+        private readonly IConfiguration _configuration;
+
+        public StudentInterfaceModel(IConfiguration configuration)
         {
+            _configuration = configuration;
+        }
+
+        public class Student
+        {
+            public string Rollno { get; set; }
+            public string Name { get; set; }
+            public string Semester { get; set; }
+
+        }
+        public List<Student> Students { get; set; }
+
+        [BindProperty]
+        public string StudentId { get; set; }
+
+        [BindProperty]
+        public string StudentPassword { get; set; }
+        public async Task OnGetAsync(string id, string password)
+        {
+            StudentId = id;
+            StudentPassword = password;
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "select Fname, Lname from users where username = @StudentId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@StudentId", StudentId);
+
+                await conn.OpenAsync(); 
+
+                SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    Student student = new Student()
+                    {
+                        Name = reader.GetString(0) + " " + reader.GetString(1)
+                    };
+                     
+                }
+
+                reader.Close();
+                cmd.Dispose();
+            }
+                
         }
     }
 }

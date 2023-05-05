@@ -48,7 +48,7 @@ namespace FLEXX.Pages
                     Message = "Login Successful!";
                     cmd.Dispose();
                     conn.Close();
-                    return RedirectToPage("/StudentInterface");
+                    return RedirectToPage("/StudentInterface", new { id = RollNumber, password = Password });
                 }
                 else
                 {

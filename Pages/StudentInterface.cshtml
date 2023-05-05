@@ -7,6 +7,8 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+
         <title>Student Portal</title>
         <style>
             * {
@@ -150,7 +152,8 @@
                     <div class="card-header">University Information</div>
                     <div class="card-body">
                         <p>
-                            <b>Roll No.: </b> 21I-0406
+                            <b>Roll No.: </b> @Model.StudentId
+                            <b>Semester: </b>
                         </p>
                     </div>
                 </div>
@@ -159,7 +162,11 @@
                     <div class="card-header">Student Information</div>
                     <div class="card-body">
                         <p>
-                            <b>Name: </b>Muhammad Raees Shujaan Azhar
+                            @foreach (var student in Model.Students)
+                            {
+                            <b>Name: </b> @student.Name
+                            }
+                            
                         </p>
                     </div>
                 </div>
@@ -170,6 +177,15 @@
                         <p>
                             <b>Guardian Name: </b>Muhammad Azhar Saeed
                         </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Semeter GPA</div>
+                    <div class="card-body">
+                        <div style="width: 100%">
+                            <canvas id="myChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -475,6 +491,9 @@
                     </form>
                 </div>
             </div>
+
+            <!--CGPA-->
+             <p style="font-weight:bold; font-style:italic; position:absolute; left: 80%; top: 37%">CGPA: 4.00</p>
 
             <div class="card" style="top: 130px; left: 28%; width: 120%">
                 <div class="card-header">Semester 1 (Fall 2021)</div>
@@ -876,5 +895,45 @@
         </script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Fall 2021', 'Spring 2022', 'Fall 2022', 'Spring 2023'],
+                    datasets: [{
+                        data: [4, 3, 3.5, 2.5],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+
     </body>
 </html>
