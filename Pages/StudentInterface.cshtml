@@ -190,9 +190,10 @@
                         <div class="form-group">
                             <label for="courseSelect">Select a course:</label>
                             <select class="form-control" id="courseSelect">
-                                <option>CSCI101 - Introduction to Computer Science</option>
-                                <option>MATH201 - Calculus I</option>
-                                <!-- Add more options for each available course -->
+                            @foreach (var course in Model.enrolledCourses)
+                            {
+                                <option>@course.id - @course.name</option>
+                            }
                             </select>
                         </div>
                     </form>
@@ -426,8 +427,10 @@
                         <div class="form-group">
                             <label for="courseSelect">Select a course:</label>
                             <select class="form-control" id="courseSelect">
-                                <option>CSCI101 - Introduction to Computer Science</option>
-                                <option>MATH201 - Calculus I</option>
+                            @foreach (var course in Model.enrolledCourses)
+                            {
+                                <option>@course.id - @course.name</option>
+                            }
                                 <!-- Add more options for each available course -->
                             </select>
                         </div>
@@ -441,24 +444,33 @@
         </div>
 
             <div class="card" style="top: 130px; left: 28%; width: 120%">
-                <div class="card-header">CSCI101 - Introduction to Computer Science</div>
+                <div class="card-header" id="attendanceTitle">CSCI101 - Introduction to Computer Science</div>
                 <div class="card-body">
                     <table class="table">
                         <thead>
+
                             <tr>
-                                <th>Lecture No.</th>
                                 <th>Date</th>
                                 <th>Duration (In Hours)</th>
                                 <th>Presence</th>
                             </tr>
                         </thead>
+
+
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>14-Aug-1947</td>
-                                <td>1.5</td>
-                                <td>P</td>
-                            </tr>
+
+
+
+
+                              @foreach (var attendance in Model.courseAttendances)
+                                {
+                                    <tr>
+                                        <td>@attendance.Date</td>
+                                        <td>@attendance.contactHours</td>
+                                        <td>@attendance.Status</td>
+                                    </tr>
+                                }
+                     
                         </tbody>
                     </table>
                 </div>

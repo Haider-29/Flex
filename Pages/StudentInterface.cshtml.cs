@@ -30,10 +30,25 @@ namespace FLEXX.Pages
 
         public class Attendance {
             
-            public string Date { get; set; }
+            public DateTime Date { get; set; }
 
             public string Status { get; set; }
+
+            public int contactHours { get; set; }
+
+            public string courseCode { get; set; }
         }
+
+
+        public class EnrolledCourse
+        {
+            public string id { get; set; }
+            public string name { get; set; }
+        }
+
+
+        public List<Attendance> courseAttendances { get; set; }
+        public List<EnrolledCourse> enrolledCourses { get; set; }
 
         public Student currStudent { get; set; }
 
@@ -97,10 +112,54 @@ namespace FLEXX.Pages
                 cmd3.Dispose();
 
 
+                courseAttendances = new List<Attendance>();
+                query = "select * from attendance where StudentID = @StudentId";
+                SqlCommand cmd4 = new SqlCommand(query, conn);
+                cmd4.Parameters.AddWithValue("@StudentId", StudentId);
+                reader = await cmd4.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    Attendance attendance = new Attendance
+                    {
+                        courseCode = reader.GetString(2),
+                        contactHours = reader.GetInt32(4),
+                        Date = reader.GetDateTime(5),
+                        Status = reader.GetString(6),
+                    };
+
+                    courseAttendances.Add(attendance);
+
+                }
+
+
+                reader.Close();
+                cmd4.Dispose();
+
+                enrolledCourses = new List<EnrolledCourse>();
+                query = "select OffCourseID, CourseName from Registration inner join Course on Registration.OffCourseID = Course.CourseCode WHERE StudentID = @StudentId and APPROVED = 1;";
+
+                SqlCommand cmd5 = new SqlCommand(query, conn);
+                cmd5.Parameters.AddWithValue("@StudentId", StudentId);
+
+                reader = await cmd5.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    EnrolledCourse course = new EnrolledCourse { 
+                        id = reader.GetString(0),
+                        name = reader.GetString(1),
+                    
+                    };
+
+                    enrolledCourses.Add(course);
+                }
+
+                reader.Close();
+                cmd5.Dispose();
 
 
             }
-                
+
         }
     }
 }
