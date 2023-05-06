@@ -219,201 +219,218 @@
                             <a class="nav-link" data-toggle="pill" href="#project">Project</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#final">Final Exam</a>
+                            <a class="nav-link" data-toggle="pill" href="#presentation">Presentation</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#total">Grand Total</a>
+                            <a class="nav-link" data-toggle="pill" href="#final">Final Exam</a>
                         </li>
                     </ul>
 
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="quiz">
-                            <table class="table">
-                                <thead>
+                    <div class="tab-pane fade" id="quiz">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Quiz #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Quiz"))
+                                {
                                     <tr>
-                                        <th>Quiz #</th>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                </thead>
-                                <tbody>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                       <div class="tab-pane fade" id="assignments">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Assignment #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Assignment"))
+                                {
                                     <tr>
-                                        <td>1</td>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                    <!-- Add more rows for each quiz-->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="assignments">
-                            <table class="table">
-                                <thead>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="sessional1">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Number #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Sessional 1"))
+                                {
                                     <tr>
-                                        <th>Assignment #</th>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                </thead>
-                                <tbody>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                       <div class="tab-pane fade" id="sessional2">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Number #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Sessional 2"))
+                                {
                                     <tr>
-                                        <td>1</td>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                    <!-- Add more rows for each assignment-->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="sesional1">
-                            <table class="table">
-                                <thead>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="project">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Project #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Project"))
+                                {
                                     <tr>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                </thead>
-                                <tbody>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                        <div class="tab-pane fade" id="presentation">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Presentation #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Presentation"))
+                                {
                                     <tr>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="sesional2">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="project">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
-                                    </tr>
-                                    <!-- Add more rows for each project-->
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                         <div class="tab-pane fade" id="final">
-                            <table class="table">
-                                <thead>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Number #</th>
+                                    <th>Weightage</th>
+                                    <th>Obtained Marks</th>
+                                    <th>Total Marks</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Final Exam"))
+                                {
                                     <tr>
-                                        <th>Weightage</th>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
+                                        <td>@eval.evalNum</td>
+                                        <td>@eval.evalWeightage</td>
+                                        <td>@eval.obtained_marks</td>
+                                        <td>@eval.total_marks</td>
+                                        <td>@eval.average</td>
+                                        <td>@eval.min</td>
+                                        <td>@eval.max</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td>5</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>10</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="total">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Obtained Marks</th>
-                                        <th>Total Marks</th>
-                                        <th>Average</th>
-                                        <th>Standard Deviation</th>
-                                        <th>Minimum</th>
-                                        <th>Maximum</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>100</td>
-                                        <td>100</td>
-                                        <td>50</td>
-                                        <td></td>
-                                        <td>0</td>
-                                        <td>100</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -983,6 +1000,40 @@
         const selectedCourseName = selectedOption.text.split(' - ')[1];
         const attendanceHeader = document.getElementById("marksCardHeader");
         attendanceHeader.innerText = selectedCourseCode + " - " + selectedCourseName;
+
+        const evaluationTypeSelect = document.getElementById("evaluationTypeSelect");
+        const selectedEvaluationType = evaluationTypeSelect.options[evaluationTypeSelect.selectedIndex].value;
+
+        // Call function to update table with evaluation data
+        getEvaluationData(selectedCourseCode, selectedEvaluationType);
+    }
+    function getEvaluationData(selectedCourseCode, selectedEvaluationType) {
+        // Get data from Model.enrolledCourses and filter by selected course code and evaluation type
+        const courseData = @Json.Serialize(Model.enrolledCourses);
+        const selectedCourseData = courseData.filter(c => c.id.startsWith(selectedCourseCode))[0];
+        const evaluationData = selectedCourseData.evaluations.filter(e => e.evaluationType == selectedEvaluationType)[0];
+
+        // Update table rows with evaluation data
+        const table = document.getElementById("marksTable");
+        const rows = table.getElementsByTagName("tr");
+        const headerRow = rows[0];
+        const dataRow = rows[1];
+
+        // Update header row
+        headerRow.cells[1].innerText = `Weightage (${evaluationData.evalWeightage}%)`;
+        headerRow.cells[2].innerText = `Obtained Marks (${evaluationData.obtained_marks}/${evaluationData.total_marks})`;
+        headerRow.cells[3].innerText = `Total Marks (${evaluationData.total_marks})`;
+        headerRow.cells[4].innerText = `Average (${evaluationData.average})`;
+        headerRow.cells[5].innerText = `Minimum (${evaluationData.min})`;
+        headerRow.cells[6].innerText = `Maximum (${evaluationData.max})`;
+
+        // Update data row
+        dataRow.cells[1].innerText = `${evaluationData.evalWeightage}%`;
+        dataRow.cells[2].innerText = `${evaluationData.obtained_marks}/${evaluationData.total_marks}`;
+        dataRow.cells[3].innerText = `${evaluationData.total_marks}`;
+        dataRow.cells[4].innerText = `${evaluationData.average}`;
+        dataRow.cells[5].innerText = `${evaluationData.min}`;
+        dataRow.cells[6].innerText = `${evaluationData.max}`;
     }
 
     window.addEventListener("load", () => {

@@ -48,7 +48,9 @@ namespace FLEXX.Pages
             public int obtained_marks { get; set; }
             public int min { get; set; }
             public int max { get; set; }
-            public double average { get; set; }
+
+            public int total_marks { get; set; }
+            public int average { get; set; }
 
         }
 
@@ -172,6 +174,68 @@ namespace FLEXX.Pages
 
                 reader.Close();
                 cmd5.Dispose();
+
+                allEvaluations = new List<Evaluations>();
+                query = "SELECT E.*, M.Score FROM Evaluation E INNER JOIN Marks M ON E.EvaluationID = M.EvaluationID WHERE M.StudentID = @StudentId";
+                SqlCommand cmd6 = new SqlCommand(query, conn);
+                cmd6.Parameters.AddWithValue("@StudentId", StudentId);
+
+                reader = await cmd6.ExecuteReaderAsync();
+    
+                int evalID;
+                while(await reader.ReadAsync())
+                {
+
+                    int avg = 0;
+                    int minNum = 0;
+                    int maxNum = 0;
+                    evalID = reader.GetInt32(0);
+                    string nested_query = "SELECT MIN(Score) AS MinMarks, MAX(Score) AS MaxMarks, AVG(Score) AS AvgMarks FROM Marks WHERE EvaluationID = @EvaluationID;";
+                    SqlCommand cmd7 = new SqlCommand(nested_query, conn);
+                    cmd7.Parameters.AddWithValue("@EvaluationID", evalID);
+                    
+                    SqlDataReader reader7 = await cmd7.ExecuteReaderAsync();
+
+                    while(await reader7.ReadAsync())
+                    {
+
+                        minNum = reader7.GetInt32(0);
+                        maxNum = reader7.GetInt32(1);
+                        avg = reader7.GetInt32(2);
+                        break;
+
+                    }
+
+
+                    reader7.Close();
+                    cmd7.Dispose();
+                    string evalType = reader.GetString(2);
+                    string evalCourseID = reader.GetString(3);
+                    int evalNumber = reader.GetInt32(4);
+                    int evalWeightage = reader.GetInt32(5);
+                    int maxMarks = reader.GetInt32(6);
+                    int score = reader.GetInt32(7);
+
+                    Evaluations evaluations = new Evaluations
+                    {
+                        average = avg,
+                        max = maxNum,
+                        min = minNum,
+                        courseCode = evalCourseID,
+                        evalNum = evalNumber, evalWeightage = evalWeightage,
+                        obtained_marks = score,
+                        total_marks = maxMarks,
+                        evaluationType = evalType,
+                        
+
+                    };
+
+                    allEvaluations.Add(evaluations);
+
+                }
+
+                reader.Close();
+                cmd6.Dispose();
 
 
             }
