@@ -482,6 +482,17 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="course-select" class="form-label">Select Course:</label>
+                        <select asp-for="NEvalCourseID" class="form-select" id="course-select">
+                            @foreach (var course in Model.AssignedSections)
+                            {
+                                <option>@course.CourseCode</option>
+                            }
+
+
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="evaluation-type-select" class="form-label">Select Evaluation Type:</label>
                         <select asp-for="NEvaluationType" class="form-select" id="evaluation-type-select">
                             <option selected>Quiz</option>

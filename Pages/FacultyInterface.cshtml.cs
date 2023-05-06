@@ -122,6 +122,10 @@ namespace FLEXX.Pages
 
         public string SaveMarksMessage { get; set; }
 
+        [BindProperty]
+
+        public string NEvalCourseID { get; set; }
+
 
 
         [BindProperty]
@@ -157,11 +161,12 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd.Dispose();
 
-                string query = "Insert into Evaluation (EvaluationID, SectionID, EvaluationType, EvaluationNumber, Weightage, MaxMarks) " +
-                    "VALUES (@EvaluationID, @NSectionID, @NEvaluationType, @NEvaluationNumber, @NWeightage, @NMaxMarks);";
+                string query = "Insert into Evaluation (EvaluationID, SectionID, EvaluationType,Courseid, EvaluationNumber, Weightage, MaxMarks) " +
+                    "VALUES (@EvaluationID, @NSectionID, @NEvaluationType, @NEvalCourseID, @NEvaluationNumber, @NWeightage, @NMaxMarks);";
                 SqlCommand insertEvaluation = new SqlCommand(query, connection);
                 insertEvaluation.Parameters.AddWithValue("@NsectionID", NSectionID);
                 insertEvaluation.Parameters.AddWithValue("@NEvaluationType", NEvaluationType);
+                insertEvaluation.Parameters.AddWithValue("@NEvalCourseID", NEvalCourseID);
                 insertEvaluation.Parameters.AddWithValue("@NEvaluationNumber", NEvaluationNumber);
                 insertEvaluation.Parameters.AddWithValue("@NWeightage", NWeightage);
                 insertEvaluation.Parameters.AddWithValue("@NMaxMarks", NMaxMarks);

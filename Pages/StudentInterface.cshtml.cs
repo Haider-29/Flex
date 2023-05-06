@@ -39,6 +39,19 @@ namespace FLEXX.Pages
             public string courseCode { get; set; }
         }
 
+        public class Evaluations
+        {
+            public string courseCode { get; set; }
+            public string evaluationType { get; set; }
+            public int evalNum { get; set; }
+            public int evalWeightage { get; set; }
+            public int obtained_marks { get; set; }
+            public int min { get; set; }
+            public int max { get; set; }
+            public double average { get; set; }
+
+        }
+
 
         public class EnrolledCourse
         {
@@ -49,6 +62,9 @@ namespace FLEXX.Pages
 
         public List<Attendance> courseAttendances { get; set; }
         public List<EnrolledCourse> enrolledCourses { get; set; }
+
+
+        public List<Evaluations> allEvaluations { get; set; }
 
         public Student currStudent { get; set; }
 

@@ -1,13 +1,13 @@
 ﻿@page
+@using System.Text.Json;
+
 @model FLEXX.Pages.StudentInterfaceModel
 @{
 }
 
-<html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
 
         <title>Student Portal</title>
         <style>
@@ -189,7 +189,7 @@
                     <form class="form-example" action="" method="post">
                         <div class="form-group">
                             <label for="courseSelect">Select a course:</label>
-                            <select class="form-control" id="courseSelect">
+                            <select class="form-control" id="courseSelectMarks" onchange="changeMarksHeader(this.value)">
                             @foreach (var course in Model.enrolledCourses)
                             {
                                 <option>@course.id - @course.name</option>
@@ -200,7 +200,7 @@
                 </div>
             </div>
             <div class="card" style="top: 130px; left: 28%; width: 120%">
-                <div class="card-header">CSCI101 - Introduction to Computer Science</div>
+                <div class="card-header" id="marksCardHeader">CSCI101 - Introduction to Computer Science</div>
                 <div class="card-body">
                     <ul class="nav nav-pills" style="margin-bottom: 3%">
                         <li class="nav-item">
@@ -425,12 +425,15 @@
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                     <form class="form-example" action="" method="post">
                         <div class="form-group">
-                            <label for="courseSelect">Select a course:</label>
-                            <select class="form-control" id="courseSelect">
-                            @foreach (var course in Model.enrolledCourses)
+                            <label for="courseSelectAttendance">Select a course:</label>
+                        <select class="form-control" id="courseSelectAttendance" onchange="changeCardHeader(this.value)">
+           @*                 @foreach (var course in Model.enrolledCourses)
                             {
                                 <option>@course.id - @course.name</option>
-                            }
+                            }*@
+
+                            <option>CS-102 - Object Oriented Programming</option>
+                            <option>CS-110 - Programming Fundamentals</option>
                                 <!-- Add more options for each available course -->
                             </select>
                         </div>
@@ -446,7 +449,7 @@
             <div class="card" style="top: 130px; left: 28%; width: 120%">
                 <div class="card-header" id="attendanceTitle">CSCI101 - Introduction to Computer Science</div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table"  id="attendanceTable">
                         <thead>
 
                             <tr>
@@ -462,14 +465,17 @@
 
 
 
-                              @foreach (var attendance in Model.courseAttendances)
-                                {
-                                    <tr>
-                                        <td>@attendance.Date</td>
-                                        <td>@attendance.contactHours</td>
-                                        <td>@attendance.Status</td>
-                                    </tr>
-                                }
+                        @foreach (var attendance in Model.courseAttendances)
+                        {
+
+                            <tr data-course-code="@attendance.courseCode">
+                                <td>@attendance.Date</td>
+                                    <td>@attendance.contactHours</td>
+                                    <td>@attendance.Status</td>
+                                </tr>
+                            
+                        }
+
                      
                         </tbody>
                     </table>
@@ -536,7 +542,6 @@
         <div id="Apply for Course" class="tabcontent">
             <div class="container">
             
-                <!-- Add New Course Form -->
             <div class="card">
                 <div class="card-header">Apply for a Course</div>
                 <div class="card-body">
@@ -880,6 +885,12 @@
         </div>
 
         <script>
+
+
+
+
+
+
             function menu(evt, tabName) {
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
@@ -940,4 +951,48 @@
         </script>
 
     </body>
-</html>
+
+<script>
+    function changeCardHeader(selectedCourseId) {
+        console.log("ok");
+        const courseSelect = document.getElementById("courseSelectAttendance");
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const selectedCourseCode = selectedOption.text.split(' - ')[0];
+        const selectedCourseName = selectedOption.text.split(' - ')[1];
+        const attendanceHeader = document.getElementById("attendanceTitle");
+        attendanceHeader.innerText = selectedCourseCode + " - " + selectedCourseName;
+
+        const attendanceTable = document.getElementById("attendanceTable");
+        const attendanceRows = attendanceTable.querySelectorAll("tbody tr");
+
+        attendanceRows.forEach(row => {
+            const courseCode = row.getAttribute("data-course-code");
+            if (courseCode !== selectedCourseCode) {
+                row.style.display = "none";
+            } else {
+                row.style.display = "";
+            }
+        });
+    }
+
+    function changeMarksHeader(selectedCourseId) {
+        console.log("ok");
+        const courseSelect = document.getElementById("courseSelectMarks");
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const selectedCourseCode = selectedOption.text.split(' - ')[0];
+        const selectedCourseName = selectedOption.text.split(' - ')[1];
+        const attendanceHeader = document.getElementById("marksCardHeader");
+        attendanceHeader.innerText = selectedCourseCode + " - " + selectedCourseName;
+    }
+
+    window.addEventListener("load", () => {
+        const courseSelect = document.getElementById("courseSelectAttendance");
+        changeCardHeader(courseSelect.value);
+
+        const marksSelect = document.getElementById("courseSelectMarks");
+        changeMarksHeader(marksSelect.value);
+    });
+
+</script>
+
+
