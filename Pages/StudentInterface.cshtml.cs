@@ -17,6 +17,8 @@ namespace FLEXX.Pages
             _configuration = configuration;
         }
 
+
+
         public class Student
         {
             public string Rollno { get; set; }
