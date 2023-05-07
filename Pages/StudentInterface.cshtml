@@ -141,7 +141,6 @@
             <button class="tablinks" onclick="menu(event, 'Marks')">Marks</button>
             <button class="tablinks" onclick="menu(event, 'Attendance')">Attendance</button>
             <button class="tablinks" onclick="menu(event, 'Transcript')">Transcript</button>
-            <button class="tablinks" onclick="menu(event, 'Apply for Course')">Apply for Course</button>
             <button class="tablinks" onclick="menu(event, 'Course Registration')">Course Registration</button>
             <button class="tablinks" onclick="menu(event, 'Feedback')">Feedback</button>
         </div>
@@ -555,28 +554,7 @@
             </div>
         </div>
 
-        <div id="Apply for Course" class="tabcontent">
-            <div class="container">
-            
-            <div class="card">
-                <div class="card-header">Apply for a Course</div>
-                <div class="card-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="courseSelect">Select a course:</label>
-                            <select class="form-control" id="courseSelect">
-                                <option>CSCI101 - Introduction to Computer Science</option>
-                                <option>MATH201 - Calculus I</option>
-                                <!-- Add more options for each available course -->
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-            </div>
-            </div>
-           
-        </div>
+
 
         <div id="Course Registration" class="tabcontent">
             <div class="container">
@@ -589,24 +567,24 @@
                                 <tr>
                                     <th>Course ID</th>
                                     <th>Course Name</th>
-                                    <th>Course Code</th>
                                     <th>Credit Hours</th>
+                                    <th>Semester</th>
                                 </tr>
                             </thead>
                             <tbody>
+
+
+                            @foreach(var offerCourse in Model.offeredCourses)
+                            {
                                 <tr>
-                                    <td>CSCI101</td>
-                                    <td>Introduction to Computer Science</td>
-                                    <td>CSCI101</td>
-                                    <td>3</td>
+                                    <td>@offerCourse.CourseID</td>
+                                    <td>@offerCourse.CourseTitle</td>
+                                    <td>@offerCourse.CreditHours</td>
+                                    <td>@offerCourse.Semester</td>
                                 </tr>
-                                <tr>
-                                    <td>MATH201</td>
-                                    <td>Calculus I</td>
-                                    <td>MATH201</td>
-                                    <td>4</td>
-                                </tr>
-                                <!-- Add more rows for each available course -->
+                            }
+                    
+                               
                             </tbody>
                         </table>
                     </div>
@@ -614,13 +592,14 @@
                 <div class="card">
                     <div class="card-header">Register for Offered Course</div>
                     <div class="card-body">
-                        <form>
+                        <form method="post" asp-page-handler="RegisterForCourse">
                             <div class="form-group">
                                 <label for="courseSelect">Select a course:</label>
-                                <select class="form-control" id="courseSelect">
-                                    <option>CSCI101 - Introduction to Computer Science</option>
-                                    <option>MATH201 - Calculus I</option>
-                                    <!-- Add more options for each available course -->
+                                <select class="form-control" id="courseSelectRegister">
+                                @foreach(var currCourse in Model.offeredCourses)
+                                {
+                                    <option>@currCourse.CourseID - @currCourse.CourseTitle</option>
+                                }
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>

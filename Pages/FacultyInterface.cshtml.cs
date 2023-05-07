@@ -80,7 +80,7 @@ namespace FLEXX.Pages
         public DateTime Date { get; set; }
 
         [BindProperty]
-        public int credit_hours { get; set; }
+        public int ContactHours { get; set; }
 
         [BindProperty]
 
@@ -332,7 +332,7 @@ namespace FLEXX.Pages
             string[] statuses = Statuses;
 
             string attendance_course_id = attendanceCourseID;
-            int attCredit = credit_hours;
+            int attCredit = ContactHours;
 
 
             Console.Write("Student ids: ", studentIds);

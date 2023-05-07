@@ -41,6 +41,17 @@ namespace FLEXX.Pages
             public string courseCode { get; set; }
         }
 
+
+        public class OfferedCourse { 
+            public string CourseID { get; set; }
+            public string CourseTitle { get; set; }
+            public int CreditHours { get; set; }
+
+            public string Semester { get; set; }
+        
+        }
+
+
         public class Evaluations
         {
             public string courseCode { get; set; }
@@ -67,7 +78,7 @@ namespace FLEXX.Pages
         public List<Attendance> courseAttendances { get; set; }
         public List<EnrolledCourse> enrolledCourses { get; set; }
 
-
+        public List<OfferedCourse> offeredCourses { get; set; }
         public List<Evaluations> allEvaluations { get; set; }
 
         public Student currStudent { get; set; }
@@ -77,6 +88,16 @@ namespace FLEXX.Pages
 
         [BindProperty]
         public string StudentPassword { get; set; }
+
+        [BindProperty] 
+
+        public string registerMessage { get; set; }
+
+/*        public async Task<IActionResult> OnPostRegisterForCourseAsync()
+        {
+
+        }*/
+
         public async Task OnGetAsync(string id, string password)
         {
             StudentId = id;
@@ -133,7 +154,7 @@ namespace FLEXX.Pages
 
 
                 courseAttendances = new List<Attendance>();
-                query = "select * from attendance where StudentID = @StudentId";
+                query = "select * from attendance where StudentID = @StudentId ORDER BY Date ASC";
                 SqlCommand cmd4 = new SqlCommand(query, conn);
                 cmd4.Parameters.AddWithValue("@StudentId", StudentId);
                 reader = await cmd4.ExecuteReaderAsync();
@@ -238,6 +259,36 @@ namespace FLEXX.Pages
 
                 reader.Close();
                 cmd6.Dispose();
+
+
+                query = "Select OfferedCourseID, Semester, CourseName, CreditHours from Offered_Course inner join Course on Offered_Course.OfferedCourseID = Course.CourseCode";
+                SqlCommand cmd8 = new SqlCommand(query, conn);
+                reader = await cmd8.ExecuteReaderAsync();
+
+                offeredCourses = new List<OfferedCourse>();
+
+                while (await reader.ReadAsync())
+                {
+
+                    string offerID = reader.GetString(0);
+                    string sem = reader.GetString(1);
+                    string offerName = reader.GetString(2);
+                    int hours = reader.GetInt32(3);
+
+                    OfferedCourse currOffer = new OfferedCourse { 
+                        CourseID = offerID,
+                        CourseTitle = offerName,
+                        CreditHours = hours,
+                        Semester = sem
+                    
+                    };
+
+                    offeredCourses.Add(currOffer);
+                }
+
+
+                reader.Close();
+                cmd8.Dispose();
 
 
             }
