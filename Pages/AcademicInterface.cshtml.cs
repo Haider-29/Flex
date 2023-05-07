@@ -22,7 +22,7 @@ namespace FLEXX.Pages
 
     public class Registration
     {
-        public string RegistrationID { get; set; }
+        public int RegistrationID { get; set; }
         public string StudentID { get; set; }
         public string OffCourseID { get; set; }
         public string Semester { get; set; }
@@ -43,7 +43,7 @@ namespace FLEXX.Pages
 
     public class RegisteredStudent
     {
-        public string RegistrationID { get; set; }
+        public int RegistrationID { get; set; }
         public string StudentID { get; set; }
         public string OffCourseID { get; set; }
         public string Semester { get; set; }
@@ -89,7 +89,7 @@ namespace FLEXX.Pages
 
 
         [BindProperty]
-        public string RegistrationID { get; set; }
+        public int RegistrationID { get; set; }
 
         [BindProperty]
 
@@ -155,7 +155,7 @@ namespace FLEXX.Pages
             {
                 await conn.OpenAsync();
 
-                string query = "SELECT R.RegistrationID, R.StudentID, R.OffCourseID, R.Semester, R.AcademicID, R.APPROVED FROM Registration R LEFT JOIN student_section SS ON R.StudentID = SS.STUDENTID AND R.OffCourseID = SS.sectionid WHERE SS.STUDENTID IS NULL AND R.APPROVED = 1 and R.OffCourseID = @FillCode";
+                string query = "SELECT R.RegistrationID, R.StudentID, R.OffCourseID, R.Semester, R.APPROVED FROM Registration R LEFT JOIN student_section SS ON R.StudentID = SS.STUDENTID AND R.OffCourseID = SS.sectionid WHERE SS.STUDENTID IS NULL AND R.APPROVED = 1 and R.OffCourseID = @FillCode";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@FillCode", FillCode);
 
@@ -167,12 +167,11 @@ namespace FLEXX.Pages
                 {
                     RegisteredStudent r = new RegisteredStudent
                     {
-                        RegistrationID = reader.GetString(0),
+                        RegistrationID = reader.GetInt32(0),
                         StudentID = reader.GetString(1),
                         OffCourseID = reader.GetString(2),
                         Semester = reader.GetString(3),
-                        AcademicID = reader.GetString(4),
-                        Approved = reader.GetInt32(5)
+                        Approved = reader.GetInt32(4)
                     };
 
                     sectionStudents.Add(r);
@@ -330,12 +329,11 @@ namespace FLEXX.Pages
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                string query = "UPDATE Registration SET APPROVED = 1, AcademicID = @OfficerEmail WHERE APPROVED = 0 AND RegistrationID = @RegistrationID;";
+                string query = "UPDATE Registration SET APPROVED = 1 WHERE APPROVED = 0 AND RegistrationID = @RegistrationID;";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 Console.WriteLine(OfficerEmail);
                 Console.WriteLine("fucku");
                 cmd.Parameters.AddWithValue("@RegistrationID", RegistrationID);
-                cmd.Parameters.AddWithValue("@OfficerEmail", OfficerEmail);
 
 
                 try
@@ -520,7 +518,7 @@ namespace FLEXX.Pages
                 reader2.Close();
                 cmd.Dispose();
 
-                string query3 = "select registrationID, studentID, offcOurseid, semester, academicid, approved from registration where approved = 0";
+                string query3 = "select registrationID, studentID, offcOurseid, semester, approved from registration where approved = 0";
                 SqlCommand cmd3 = new SqlCommand(query3, conn);
 
                 SqlDataReader reader3 = await cmd3.ExecuteReaderAsync();
@@ -531,12 +529,11 @@ namespace FLEXX.Pages
                 {
                     Registration r = new Registration
                     {
-                        RegistrationID = reader3.GetString(0),
+                        RegistrationID = reader3.GetInt32(0),
                         StudentID = reader3.GetString(1),
                         OffCourseID = reader3.GetString(2),
                         Semester = reader3.GetString(3),
-                        AcademicID = reader3.GetString(4),
-                        Approved = reader3.GetInt32(5)
+                        Approved = reader3.GetInt32(4)
                     };
 
                     approvalRequests.Add(r);

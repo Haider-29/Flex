@@ -528,8 +528,9 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd.Dispose();
 
-                string q2 = "SELECT u.Username, u.FName, u.LName, ss.sectionid FROM student_section AS ss JOIN users AS u ON ss.STUDENTID = u.Username WHERE u.Role = 'S';";
+                string q2 = "SELECT u.Username, u.FName, u.LName FROM users u INNER JOIN student_section ss ON u.Username = ss.StudentID INNER JOIN Section s ON ss.SectionID = s.SectionID WHERE s.FacultyID = @TeacherEmail;";
                 SqlCommand cum = new SqlCommand(q2, connection);
+                cum.Parameters.AddWithValue("@TeacherEmail", TeacherEmail);
                 SqlDataReader readStudents = await cum.ExecuteReaderAsync();
                 Students = new List<Student>();
                 while (await  readStudents.ReadAsync())

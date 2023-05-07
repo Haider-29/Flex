@@ -595,13 +595,21 @@
                         <form method="post" asp-page-handler="RegisterForCourse">
                             <div class="form-group">
                                 <label for="courseSelect">Select a course:</label>
-                                <select class="form-control" id="courseSelectRegister">
+                                <select asp-for="RegisterCourseID" class="form-control" id="courseSelectRegister">
                                 @foreach(var currCourse in Model.offeredCourses)
                                 {
-                                    <option>@currCourse.CourseID - @currCourse.CourseTitle</option>
+
+
+                                    <option>
+                                      
+
+                                        
+                                        @currCourse.CourseID - @currCourse.CourseTitle</option>
                                 }
                                 </select>
                             </div>
+                        <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.registerMessage) ? "" : "display:none;")">@Model.registerMessage</p>
+
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
                     </div>

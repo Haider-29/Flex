@@ -46,6 +46,8 @@ namespace FLEXX.Pages
                 if (reader.HasRows)
                 {
                     Message = "Login Successful!";
+                    HttpContext.Session.SetString("StudentID", RollNumber);
+
                     cmd.Dispose();
                     conn.Close();
                     return RedirectToPage("/StudentInterface", new { id = RollNumber, password = Password });

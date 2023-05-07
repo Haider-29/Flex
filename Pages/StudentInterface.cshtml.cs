@@ -93,15 +93,125 @@ namespace FLEXX.Pages
 
         public string registerMessage { get; set; }
 
-/*        public async Task<IActionResult> OnPostRegisterForCourseAsync()
+        [BindProperty]
+        public string RegisterCourseID { get; set; }
+
+        public async Task<IActionResult> OnPostRegisterForCourseAsync()
         {
 
-        }*/
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-        public async Task OnGetAsync(string id, string password)
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                // attendance ids
+                string q = "SELECT TOP 1 RegistrationID FROM Registration ORDER BY RegistrationID DESC";
+                SqlCommand cmd = new SqlCommand(q, connection);
+
+                SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                int resgisterID = 1;
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        resgisterID = reader.GetInt32(0) + 1;
+                        break;
+                    }
+                }
+
+                reader.Close();
+                cmd.Dispose();
+                await OnGetAsync(StudentId, StudentPassword);
+                string id = RegisterCourseID.Substring(0, RegisterCourseID.IndexOf(" "));
+
+
+                q = "Select OfferedCourseID, Semester, CourseName, CreditHours from Offered_Course inner join Course on Offered_Course.OfferedCourseID = Course.CourseCode";
+                SqlCommand cmd8 = new SqlCommand(q, connection);
+                reader = await cmd8.ExecuteReaderAsync();
+
+                offeredCourses = new List<OfferedCourse>();
+
+                while (await reader.ReadAsync())
+                {
+
+                    string offerID = reader.GetString(0);
+                    string sem = reader.GetString(1);
+                    string offerName = reader.GetString(2);
+                    int hours = reader.GetInt32(3);
+
+                    OfferedCourse currOffer = new OfferedCourse
+                    {
+                        CourseID = offerID,
+                        CourseTitle = offerName,
+                        CreditHours = hours,
+                        Semester = sem
+
+                    };
+
+                    offeredCourses.Add(currOffer);
+                }
+
+
+                reader.Close();
+                cmd8.Dispose();
+                // find semester according to RegisterCourseID and offeredCoursesList
+                // Assume that you have a List<OfferedCourse> object called "offeredCourses" and a string variable called "courseId" containing the course ID you want to find the semester for
+                string semester = offeredCourses.FirstOrDefault(c => c.CourseID == id)?.Semester;
+
+                q = "INSERT INTO REGISTRATION (RegistrationID, StudentID, OffCourseID, Semester, APPROVED) VALUES(@RegistrationID, @StudentID, @OffCourseID, @Semester, @APPROVED);";
+                SqlCommand cmd2 = new SqlCommand(q, connection);
+                cmd2.Parameters.AddWithValue("@RegistrationID", resgisterID);
+                cmd2.Parameters.AddWithValue("@StudentID", HttpContext.Session.GetString("StudentID"));
+                cmd2.Parameters.AddWithValue("@OffCourseID", id);
+                cmd2.Parameters.AddWithValue("@Semester", semester);
+                cmd2.Parameters.AddWithValue("@APPROVED", 0);
+
+
+
+                try
+                {
+                    int rowsAffected = await cmd2.ExecuteNonQueryAsync();
+                    if (rowsAffected > 0)
+                    {
+                        registerMessage = "Course Applied for Successfully!";
+                    }
+                } catch (SqlException ex) {
+
+                    if (ex.Number == 2627)
+                    {
+                        // Primary key violation (duplicate email)
+                        registerMessage = "The course has already been applied";
+                    }
+                    else
+                    {
+                        // Other SQL errors
+                        registerMessage = "An error occurred during registration. Please try again.";
+                    }
+
+                }
+
+                cmd2.Dispose();
+                connection.Close();
+            }
+
+
+            await OnGetAsync(StudentId, StudentPassword);
+            return Page();
+
+
+
+
+        }
+        [HttpGet]
+
+            public async Task OnGetAsync(string id, string password)
         {
+
             StudentId = id;
             StudentPassword = password;
+            StudentId = HttpContext.Session.GetString("StudentID");
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection conn = new SqlConnection(connectionString))
