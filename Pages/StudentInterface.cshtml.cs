@@ -29,6 +29,17 @@ namespace FLEXX.Pages
 
         }
 
+        public class Transcript
+        {
+            public string CourseID { get; set; }
+            public string Name { get; set; }
+            public string Section { get; set; }
+            public int CreditHours { get; set; }
+            public string Grade { get; set; }
+
+            public string Semester { get; set; }
+
+        }
 
         public class Attendance {
             
@@ -48,6 +59,7 @@ namespace FLEXX.Pages
             public int CreditHours { get; set; }
 
             public string Semester { get; set; }
+            public string Section { get; set; }
         
         }
 
@@ -74,6 +86,9 @@ namespace FLEXX.Pages
             public string name { get; set; }
         }
 
+
+
+        public List<Transcript> transcripts { get; set; }
 
         public List<Attendance> courseAttendances { get; set; }
         public List<EnrolledCourse> enrolledCourses { get; set; }
@@ -204,9 +219,12 @@ namespace FLEXX.Pages
 
 
         }
-        [HttpGet]
 
-            public async Task OnGetAsync(string id, string password)
+
+
+        [HttpGet]
+         public async Task OnGetAsync(string id, string password)
+
         {
 
             StudentId = id;
@@ -262,7 +280,7 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd3.Dispose();
 
-
+                // query to return attendance data of student
                 courseAttendances = new List<Attendance>();
                 query = "select * from attendance where StudentID = @StudentId ORDER BY Date ASC";
                 SqlCommand cmd4 = new SqlCommand(query, conn);
@@ -286,6 +304,8 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd4.Dispose();
 
+                // query to return courses enrolled in
+
                 enrolledCourses = new List<EnrolledCourse>();
                 query = "select OffCourseID, CourseName from Registration inner join Course on Registration.OffCourseID = Course.CourseCode WHERE StudentID = @StudentId and APPROVED = 1;";
 
@@ -307,6 +327,9 @@ namespace FLEXX.Pages
 
                 reader.Close();
                 cmd5.Dispose();
+
+
+                // query to return all evaluation data type marks and all
 
                 allEvaluations = new List<Evaluations>();
                 query = "SELECT E.*, M.Score FROM Evaluation E INNER JOIN Marks M ON E.EvaluationID = M.EvaluationID WHERE M.StudentID = @StudentId";
@@ -370,7 +393,7 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd6.Dispose();
 
-
+                // query to return all offered courses
                 query = "Select OfferedCourseID, Semester, CourseName, CreditHours from Offered_Course inner join Course on Offered_Course.OfferedCourseID = Course.CourseCode";
                 SqlCommand cmd8 = new SqlCommand(query, conn);
                 reader = await cmd8.ExecuteReaderAsync();
@@ -400,7 +423,39 @@ namespace FLEXX.Pages
                 reader.Close();
                 cmd8.Dispose();
 
+                // query to retuen trnascript data grouped by semester in ascending order
+                query = "SELECT C.CourseCode, C.CourseName, SS.sectionid, C.CreditHours, SS.grade, OC.Semester FROM Registration R JOIN Offered_Course OC ON R.OffCourseID = OC.OfferedCourseID AND R.Semester = OC.Semester JOIN Course C ON OC.OfferedCourseID = C.CourseCode JOIN student_section SS ON R.StudentID = SS.STUDENTID AND R.OffCourseID = C.CourseCode AND R.Semester = OC.Semester WHERE R.APPROVED = 1 AND R.StudentID = @StudentID ORDER BY CAST(SUBSTRING(OC.Semester, CHARINDEX(' ', OC.Semester) + 1, LEN(OC.Semester)) AS INT), CASE WHEN LEFT(OC.Semester, CHARINDEX(' ', OC.Semester) - 1) = 'Spring' THEN 1 ELSE 2 END;";
 
+                SqlCommand cmd9 = new SqlCommand(query, conn);
+                cmd9.Parameters.AddWithValue("@StudentID", StudentId);
+                reader = await cmd9.ExecuteReaderAsync();
+
+                transcripts = new List<Transcript>();
+                while (await reader.ReadAsync())
+                {
+                    string course_code = reader.GetString(0);
+                    string name = reader.GetString(1);
+                    string sec = reader.GetString(2);
+                    int credit = reader.GetInt32(3);
+                    string g = reader.GetString(4);
+                    string sem = reader.GetString(5);
+
+                    Transcript curr = new Transcript {
+
+                        CourseID = course_code,
+                        Name = name,
+                        CreditHours = credit,
+                        Grade = g,
+                        Semester = sem,
+                        Section = sec
+                        
+                    
+                    };
+
+                    transcripts.Add(curr);
+                }
+                reader.Close();
+                cmd9.Dispose();
             }
 
         }
