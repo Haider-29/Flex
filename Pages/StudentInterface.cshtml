@@ -518,8 +518,12 @@
             </div>
         </div>
 
-            <!--CGPA-->
-             <p style="font-weight:bold; font-style:italic; position:absolute; left: 80%; top: 37%">CGPA: 4.00</p>
+        @{
+            var totalGradePoints = Model.transcripts.Sum(t => t.GetGradePoints() * t.CreditHours);
+            var totalCreditHours = Model.transcripts.Sum(t => t.CreditHours);
+            var cgpa = totalCreditHours > 0 ? totalGradePoints / totalCreditHours : 0;
+        }
+        <p style="font-weight:bold; font-style:italic; position:absolute; left: 80%; top: 37%">CGPA: @String.Format("{0:F2}", cgpa)</p>
 
             <div class="card" style="top: 130px; left: 28%; width: 120%">
             @foreach (var semesterGroup in Model.transcripts.GroupBy(t => t.Semester))
