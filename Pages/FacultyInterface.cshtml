@@ -655,6 +655,145 @@
         </div>
     </div>
 
+    <br />
+    <hr />
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                Evaluation Report
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Evaluation Type</th>
+                            <th>Evaluation Number</th>
+                            <th>Max Marks</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.EvaluationReport)
+                        {
+                            <tr>
+                                <td>@item.StudentName</td>
+                                <td>@item.EvaluationType</td>
+                                <td>@item.EvaluationNumber</td>
+                                <td>@item.MaxMarks</td>
+                                <td>@item.Score</td>
+                                <td>@item.Percentage %</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <hr />
+
+
+    <div class="container mt-5">
+        <form method="post" asp-page-handler="FilterCourse">
+            <div class="form-group">
+                <label for="courseSelect">Select Course:</label>
+                <select class="form-control" id="courseSelect" name="selectedCourse">
+                    @foreach (var course in Model.AssignedSections)
+                    {
+                        <option value="@course.CourseCode">@course.CourseTitle</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+    </div>
+
+
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                Grade Report
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Section</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.GradeReport)
+                        {
+                            <tr>
+                                <td>@item.RollNo</td>
+                                <td>@item.Name</td>
+                                <td>@item.Section</td>
+                                <td>@item.Grade</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <hr />
+
+    <div class="container mt-5">
+        <form method="post" asp-page-handler="FilterSection">
+            <div class="form-group">
+                <label for="courseSelect">Select Course:</label>
+                <select class="form-control" id="courseSelect" name="selectedSectionID">
+                    @foreach (var course in Model.AssignedSections)
+                    {
+                        <option value="@course.SectionName">@course.SectionName</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+
+    </div>
+
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                Grade Count Report
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.GradeCountReport)
+                        {
+                            <tr>
+                        
+                                <td>@item.Grade</td>
+                                <td>@item.Count</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <!-- JavaScript function to open the modal -->
     <script>

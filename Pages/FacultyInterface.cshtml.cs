@@ -72,7 +72,7 @@ namespace FLEXX.Pages
             public int TotalMarks { get; set; }
 
             public string? id { get; set; }
-         }
+        }
 
         [BindProperty]
 
@@ -144,7 +144,7 @@ namespace FLEXX.Pages
 
         [BindProperty]
 
-        public List<studentAttendance> Attendances { get; set; }    = new List<studentAttendance>();
+        public List<studentAttendance> Attendances { get; set; } = new List<studentAttendance>();
 
         public async Task<IActionResult> OnPostAddEvaluationAsync()
         {
@@ -152,8 +152,9 @@ namespace FLEXX.Pages
             string[] studentIds = StudentIds;
             string sectionId = SectionId;
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            using (SqlConnection connection = new SqlConnection(connectionString)) { 
-            
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+
                 await connection.OpenAsync();
 
                 // attendance ids
@@ -197,7 +198,8 @@ namespace FLEXX.Pages
                         await OnGetAsync(TeacherEmail, TeacherPassword);
                         return Page();
                     }
-                } catch(SqlException sqlEx)
+                }
+                catch (SqlException sqlEx)
                 {
                     insertEvaluation.Dispose();
                     connection.Close();
@@ -238,15 +240,15 @@ namespace FLEXX.Pages
 
                 int evaluationId = 0;
                 SqlDataReader reader = await getEvaluationIdCmd.ExecuteReaderAsync();
-                
-                    if (reader.HasRows)
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.ReadAsync())
-                        {
-                            evaluationId = reader.GetInt32(0);
-                            break;
-                        }
+                        evaluationId = reader.GetInt32(0);
+                        break;
                     }
+                }
                 reader.Close();
                 getEvaluationIdCmd.Dispose();
 
@@ -262,9 +264,9 @@ namespace FLEXX.Pages
 
 
                 Console.Write(evaluationId);
-        // insert marks records
-        string query = "INSERT INTO Marks (MarksID, StudentID, EvaluationID, EvaluationType, Score) " +
-        "VALUES (@MarksID, @StudentID, @EvaluationID, @EvaluationType, @Score)";
+                // insert marks records
+                string query = "INSERT INTO Marks (MarksID, StudentID, EvaluationID, EvaluationType, Score) " +
+                "VALUES (@MarksID, @StudentID, @EvaluationID, @EvaluationType, @Score)";
                 SqlCommand cmd = new SqlCommand(query, connection);
 
                 for (int i = 0; i < studentIds.Length; i++)
@@ -322,7 +324,7 @@ namespace FLEXX.Pages
                             SaveMarksMessage = "An error occurred while saving the marks. Please try again.";
                         }
 
-   
+
 
                     }
                 }
@@ -395,7 +397,7 @@ namespace FLEXX.Pages
                     cmd2.Parameters.AddWithValue("@AttendanceID", attendanceID);
                     cmd2.Parameters.AddWithValue("@StudentID", studentIds[i]);
                     cmd2.Parameters.AddWithValue("@CourseID", attendance_course_id);
-                    
+
                     cmd2.Parameters.AddWithValue("@SectionID", sectionId);
                     cmd2.Parameters.AddWithValue("@CreditHours", attCredit);
                     cmd2.Parameters.AddWithValue("@Date", date);
@@ -438,7 +440,7 @@ namespace FLEXX.Pages
 
 
 
-            
+
             }
 
             await OnGetAsync(TeacherEmail, TeacherPassword);
@@ -446,7 +448,7 @@ namespace FLEXX.Pages
 
         }
 
-        public IList<AttendanceModel> AttendanceReport { get; set; }
+        public IList<AttendanceModel> AttendanceReport { get; set; } = new List<AttendanceModel>();
 
         public class AttendanceModel
         {
@@ -457,6 +459,36 @@ namespace FLEXX.Pages
             public int AttendedClasses { get; set; }
             public double AttendancePercentage { get; set; }
         }
+
+        public class GradeCountModel
+        {
+            public string Grade { get; set; }
+            public int Count { get; set; }
+        }
+
+
+        public class EvaluationReportModel
+        {
+            public string StudentName { get; set; }
+            public string EvaluationType { get; set; }
+            public int EvaluationNumber { get; set; }
+            public int MaxMarks { get; set; }
+            public int Score { get; set; }
+            public double Percentage { get; set; }
+        }
+
+        public List<EvaluationReportModel> EvaluationReport { get; set; } = new List<EvaluationReportModel>();
+
+        public class GradeReportModel
+        {
+            public string RollNo { get; set; }
+            public string Name { get; set; }
+            public string Section { get; set; }
+            public string Grade { get; set; }
+        }
+        public List<GradeReportModel> GradeReport { get; set; } = new List<GradeReportModel>();
+
+        public List<GradeCountModel> GradeCountReport { get; set; } = new List<GradeCountModel>();
 
         [HttpGet]
         public async Task OnGetAsync(string email, string password)
@@ -474,13 +506,13 @@ namespace FLEXX.Pages
             TeacherEmail = email;
             TeacherPassword = password;
 
-                     
-           TeacherEmail = HttpContext.Session.GetString("UserName");
+
+            TeacherEmail = HttpContext.Session.GetString("UserName");
 
 
             Console.Write(TeacherEmail);
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
@@ -491,7 +523,7 @@ namespace FLEXX.Pages
 
                 AssignedSections = new List<MarksDistributionTable>();
 
-                while(await reader.ReadAsync())
+                while (await reader.ReadAsync())
                 {
 
                     // getting teacher's name from faculty email
@@ -504,7 +536,8 @@ namespace FLEXX.Pages
                     cmd2.Parameters.AddWithValue("@TeacherEmail", TeacherEmail);
                     SqlDataReader reader2 = await cmd2.ExecuteReaderAsync();
                     string teacher_name = "";
-                    if (reader2.Read()) {
+                    if (reader2.Read())
+                    {
                         teacher_name = reader2.GetString(0);
                         teacher_name += " ";
                         teacher_name += reader2.GetString(1);
@@ -512,8 +545,8 @@ namespace FLEXX.Pages
                     cmd2.Dispose();
                     reader2.Close();
                     // getting course title using course id
-                  
-                    
+
+
                     string course_id = reader.GetString(1);
                     string nestedQuery2 = "select CourseName from Course where CourseCode = @course_id";
                     SqlCommand cmd3 = new SqlCommand(nestedQuery2, connection);
@@ -527,15 +560,16 @@ namespace FLEXX.Pages
                     }
                     cmd3.Dispose();
                     reader3.Close();
-                
 
-                    MarksDistributionTable table = new MarksDistributionTable {
+
+                    MarksDistributionTable table = new MarksDistributionTable
+                    {
                         CourseCode = reader.GetString(1),
                         TeacherName = teacher_name,
                         SectionName = reader.GetString(0),
                         CourseTitle = course_name
 
-                            
+
 
                     };
 
@@ -589,7 +623,8 @@ namespace FLEXX.Pages
 
                 for (int i = 0; i < StudentIds.Length; i++)
                 {
-                    StudentMark studentMark = new StudentMark { 
+                    StudentMark studentMark = new StudentMark
+                    {
                         id = StudentIds[i],
                     };
 
@@ -615,11 +650,18 @@ namespace FLEXX.Pages
     INNER JOIN Section s ON a.SectionID = s.SectionID
     INNER JOIN users u ON r.StudentID = u.Username
     INNER JOIN Course c ON a.CourseID = c.CourseCode
+    WHERE s.FacultyID = @FacultyID
     GROUP BY r.RegistrationID, u.FName, u.LName, c.CreditHours
     ORDER BY r.RegistrationID";
 
 
+
                 SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FacultyID", TeacherEmail);
+
+
+
+
                 reader = await command.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -645,13 +687,150 @@ namespace FLEXX.Pages
 
                 reader.Close();
                 command.Dispose();
+                query = @"
+SELECT u.FName + ' ' + u.LName AS StudentName, 
+       m.EvaluationType, 
+       e.EvaluationNumber,
+       e.MaxMarks, 
+       m.Score AS Score, 
+       (CAST(m.Score AS FLOAT) / e.MaxMarks) * 100 AS Percentage
+FROM Marks m
+INNER JOIN Users u ON m.StudentID = u.Username
+INNER JOIN Evaluation e ON m.EvaluationID = e.EvaluationID
+INNER JOIN Section s ON e.SectionID = s.SectionID
+INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
+WHERE s.FacultyID = @FacultyID
+ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
+                command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FacultyID", TeacherEmail);  // Set the Faculty ID
+                reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    string studentName = reader.GetString(0);
+                    string evt = reader.GetString(1);
+                    int evn = reader.GetInt32(2);
+                    int maxMarks = reader.GetInt32(3);
+                    int score = reader.GetInt32(4);
+                    double percentage = reader.GetDouble(5);
+
+                    EvaluationReport.Add(new EvaluationReportModel
+                    {
+                        StudentName = studentName,
+                        EvaluationType = evt,
+                        EvaluationNumber = evn,
+                        MaxMarks = maxMarks,
+                        Score = score,
+                        Percentage = Math.Round(percentage, 2)
+                    });
+                }
+
+                reader.Close();
+                command.Dispose();
+
+
+
 
                 connection.Close();
             }
 
-            
+
+        }
+
+
+        public async Task<IActionResult> OnPostFilterSectionAsync()
+        {
+            // Get the selected course ID from the form
+            string selectedSectionID = Request.Form["selectedSectionID"];
+            TeacherEmail = HttpContext.Session.GetString("UserName");
+
+            string query = "SELECT ss.grade AS Grade, COUNT(*) AS Count FROM student_section ss WHERE ss.sectionid = @SelectedSectionID GROUP BY ss.grade;";
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@SelectedSectionID", selectedSectionID); 
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var reportRow = new GradeCountModel
+                    {
+                        Grade = reader.GetString(0),
+                        Count = reader.GetInt32(1)
+                    };
+
+                    GradeCountReport.Add(reportRow);
+                }
+
+                reader.Close();
+                command.Dispose();
+                connection.Close();
+            }
+            await OnGetAsync(TeacherEmail, TeacherPassword);
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostFilterCourseAsync()
+        {
+            // Get the selected course ID from the form
+            string selectedCourse = Request.Form["selectedCourse"];
+            TeacherEmail = HttpContext.Session.GetString("UserName");
+
+            // Run the query with the selected course
+            var query = @"
+        SELECT u.Username AS RollNo, u.FName + ' ' + u.LName AS Name, 
+               s.SectionID AS Section, ss.grade AS Grade
+        FROM student_section ss
+        INNER JOIN Users u ON ss.STUDENTID = u.Username
+        INNER JOIN Section s ON ss.sectionid = s.SectionID
+        INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
+        WHERE s.FacultyID = @FacultyID AND oc.OfferedCourseID = @CourseID
+        ORDER BY u.Username, s.SectionID";
+
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FacultyID", TeacherEmail); // Set the Faculty ID
+                command.Parameters.AddWithValue("@CourseID", selectedCourse); // Set the Course ID
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    var reportRow = new GradeReportModel
+                    {
+                        RollNo = reader.GetString(0),
+                        Name = reader.GetString(1),
+                        Section = reader.GetString(2),
+                        Grade = reader.GetString(3)
+                    };
+
+                    GradeReport.Add(reportRow);
+                }
+
+                reader.Close();
+                command.Dispose();
+
+                connection.Close();
+
+            } // Fetch the data and populate the GradeReport list
+            // ...
+
+
+
+            // Render the view with the updated data
+
+            await OnGetAsync(TeacherEmail, TeacherPassword);
+            return Page();
         }
     }
-}
+
+    }
 
 

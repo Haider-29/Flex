@@ -487,7 +487,7 @@
                             <tr data-course-code="@attendance.courseCode">
                                 <td>@attendance.Date</td>
                                     <td>@attendance.contactHours</td>
-                                    <td>@attendance.Status</td>
+                                    <td id="status">@attendance.Status</td>
                                 </tr>
                             
                         }
@@ -974,7 +974,6 @@
 
     <script>
         function changeCardHeader(selectedCourseId) {
-            console.log("ok");
             const courseSelect = document.getElementById("courseSelectAttendance");
             const selectedOption = courseSelect.options[courseSelect.selectedIndex];
             const selectedCourseCode = selectedOption.text.split(' - ')[0];
@@ -993,8 +992,28 @@
                     row.style.display = "";
                 }
             });
+
+            var totalDays = 0;
+            var daysAttended = 0;
+            var progressBars = document.querySelectorAll("[data-course-code='" + selectedCourseCode + "'] .progress-bar");
+            for (var i = 0; i < progressBars.length; i++) {
+                var progressBar = progressBars[i];
+                totalDays++;
+                if (progressBar.getElementById("data-status") === "Present" || progressBar.getAttribute("data-status") === "Late") {
+                    daysAttended++;
+                }
+            }
+            var attendancePercentage = (daysAttended * 100) / totalDays;
+            var progressBars = document.querySelectorAll("[data-course-code='" + selectedCourseCode + "'] .progress-bar");
+            for (var i = 0; i < progressBars.length; i++) {
+                var progressBar = progressBars[i];
+                progressBar.style.width = attendancePercentage + "%";
+                progressBar.setAttribute("aria-valuenow", attendancePercentage);
+                progressBar.innerHTML = attendancePercentage + "%";
+            }
         }
 
+       
         function changeMarksHeader(selectedCourseId) {
             console.log("ok");
             const courseSelect = document.getElementById("courseSelectMarks");
