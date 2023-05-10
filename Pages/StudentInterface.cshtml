@@ -2,8 +2,8 @@
 @using System.Text.Json;
 
 @model FLEXX.Pages.StudentInterfaceModel
-@{
-}
+
+
 
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -192,6 +192,7 @@
                             @foreach (var course in Model.enrolledCourses)
                             {
                                 <option>@course.id - @course.name</option>
+                             
                             }
                             </select>
                         </div>
@@ -238,10 +239,10 @@
                                     <th>Average</th>
                                     <th>Minimum</th>
                                     <th>Maximum</th>
-                                </tr>
+                                </tr>0
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Quiz"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Quiz"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -271,7 +272,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Assignment"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Assignment"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -301,7 +302,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Sessional 1"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Sessional 1"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -330,7 +331,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Sessional 2"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Sessional 2"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -359,7 +360,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Project"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Project"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -388,7 +389,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Presentation"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Presentation"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -417,7 +418,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-102" && e.evaluationType == "Final Exam"))
+                                @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Final Exam"))
                                 {
                                     <tr>
                                         <td>@eval.evalNum</td>
@@ -632,15 +633,16 @@
                         <label for="date-input" class="form-label">Date:</label>
                         <input type="date" class="form-control" id="date-input">
                     </div>
-                    <form>
-                        <div class="form-group">
-                            <label for="instSelect">Select an Instructor:</label>
-                            <select class="form-control" id="instSelect">
-                                <option>Haider Naqvi</option>
-                                <option>Ibrahim Basit</option>
-                                <!-- Add more options for each available course -->
-                            </select>
-                        </div>
+                <form method="post" asp-page-handler="AddFeedback">
+                    <div class="form-group">
+                        <label for="courseSelect">Select a course:</label>
+                        <select class="form-control" id="courseSelect" asp-for="FeedbackCourseId">
+                            @foreach (var course in Model.enrolledCourses)
+                            {
+                                <option value="@course.id">@course.id - @course.name</option>
+                            }
+                        </select>
+                    </div>
                     </form>
                     <p><b>
                         Please fill out the form in evaluating your instructor for the semester. After completion, please press the submit button.

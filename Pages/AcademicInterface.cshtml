@@ -15,6 +15,19 @@
             background-color: #f8f9fa;
         }
 
+        .table {
+            background-color: #fff;
+        }
+
+            .table th {
+                background-color: #007bff;
+                color: #fff;
+            }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f2f2f2;
+        }
+
         .container {
             margin-top: 30px;
         }
@@ -254,7 +267,117 @@
             <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.Message4) ? "" : "display:none;")">@Model.Message4</p>
         </div>
 
+            <div class="card">
+                <div class="card-header">
+                    Offered Courses Report
+                </div>
+                <div class="card-body">
+                    @foreach (var semester in Model.CoursesBySemester)
+                    {
+                        <h3>@semester.Key</h3>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Credit Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in semester.Value)
+                                {
+                                    <tr>
+                                        <td>@course.CourseCode</td>
+                                        <td>@course.CourseName</td>
+                                        <td>@course.CreditHours</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
 
+            <div class="card">
+        <div class="card-header">
+
+            Student Sections Report
+           </div>
+        <div class="card-body">
+            @foreach (var sec in Model.StudentsBySection)
+            {
+                <h3>Section @sec.Key</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Registration No.</th>
+                            <th>Student Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in sec.Value)
+                        {
+                            <tr>
+                                <td>@student.RegistrationNo</td>
+                                <td>@student.StudentName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+
+        <div class="card">
+            <div class="card-header">
+                Course Allocation Report
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Course CHs</th>
+                        <th>Sections</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var courseAllocation in Model.CourseAllocations)
+                    {
+                        <tr>
+                            <td>@courseAllocation.CourseCode</td>
+                            <td>@courseAllocation.CourseName</td>
+                            <td>@courseAllocation.CreditHours</td>
+                            <td>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Section</th>
+                                            <th>Instructor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var sec in courseAllocation.Sections)
+                                        {
+                                            <tr>
+                                                <td>@sec.SectionID</td>
+                                                <td>@sec.InstructorName</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+        </div>
         </body>
 
 </html>

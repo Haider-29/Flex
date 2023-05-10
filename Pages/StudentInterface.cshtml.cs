@@ -131,6 +131,112 @@ namespace FLEXX.Pages
 
         [BindProperty]
         public string RegisterCourseID { get; set; }
+        [BindProperty]
+        public string FeedbackFormData { get; set; }
+
+        [BindProperty]
+        public string FeedbackStudentId { get; set; }
+
+        [BindProperty]
+        public string FeedbackFacultyId { get; set; }
+
+        [BindProperty]
+
+        public string FeedbackMessage { get; set; }
+        [BindProperty]
+        public string FeedbackCourseId { get; set; }
+
+
+        [BindProperty]
+
+
+        public string MarksCourseID { get; set; }
+
+
+        public async Task<IActionResult> OnPostSetCourseIdAsync(string courseId)
+        {
+            HttpContext.Session.SetString("CourseID", courseId);
+            await OnGetAsync(StudentId, StudentPassword);
+
+            return Page();
+        }
+
+
+        public async Task<IActionResult> OnPostAddFeedbackAsync()
+        {
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                // Fetch the maximum FeedbackID from the Feedback table
+                string query = "SELECT ISNULL(MAX(FeedbackID), 0) FROM Feedback;";
+                SqlCommand cmd = new SqlCommand(query, connection);
+
+                int feedbackId = 1; // Default value
+
+                try
+                {
+                    object result = await cmd.ExecuteScalarAsync();
+                    feedbackId = Convert.ToInt32(result) + 1; // Increment the max FeedbackID by one
+                }
+                catch (SqlException ex)
+                {
+                    FeedbackMessage = "An error occurred while getting the FeedbackID: " + ex.Message;
+                    return Page();
+                }
+
+                // Fetch the FacultyID teaching the selected course
+                query = "SELECT FacultyID FROM Section WHERE OfferedCourseID = @CourseId;";
+                cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@CourseId", FeedbackCourseId);
+
+                string facultyId; // Will store the fetched FacultyID
+
+                try
+                {
+                    object result = await cmd.ExecuteScalarAsync();
+                    facultyId = Convert.ToString(result);
+                }
+                catch (SqlException ex)
+                {
+                    FeedbackMessage = "An error occurred while getting the FacultyID: " + ex.Message;
+                    return Page();
+                }
+
+                // Create a new feedback
+                query = "INSERT INTO Feedback (FeedbackID, StudentID, FacultyID, FeedbackFormData) VALUES(@FeedbackID, @StudentID, @FacultyID, @FeedbackFormData);";
+                cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@FeedbackID", feedbackId);
+                cmd.Parameters.AddWithValue("@StudentID", HttpContext.Session.GetString("StudentID"));
+                cmd.Parameters.AddWithValue("@FacultyID", facultyId);
+                cmd.Parameters.AddWithValue("@FeedbackFormData", FeedbackFormData);
+
+                try
+                {
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    if (rowsAffected > 0)
+                    {
+                        FeedbackMessage = "Feedback was submitted successfully!";
+                    }
+                    else
+                    {
+                        FeedbackMessage = "An error occurred. Please try again.";
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    // Handle specific SQL exceptions here
+                    FeedbackMessage = "An error occurred while submitting the feedback: " + ex.Message;
+                }
+
+                connection.Close();
+            }
+
+            await OnGetAsync(StudentId, StudentPassword);
+            return Page();
+        }
 
         public async Task<IActionResult> OnPostRegisterForCourseAsync()
         {

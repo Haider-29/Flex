@@ -529,6 +529,8 @@
             </div>
         </div>
 
+
+
     </div>
 
         <br />
@@ -550,7 +552,7 @@
                 <div class="row mb-3">
                     <label for="sectionSelect" class="col-sm-2 col-form-label">Select Section</label>
                     <div class="col-sm-4">
-                            <select asp-for="NSectionID" class="form-select" id="section-select" onchange="filterStudents()">
+                            <select asp-for="NSectionID" class="form-select" id="section-select" onchange="filterMarks(this.value, 'studentsTableBody')">
 
                                 @foreach (var course in Model.AssignedSections)
                                 {
@@ -588,16 +590,15 @@
                             <th>Marks Obtained</th>
                         </tr>
                     </thead>
-                    <tbody>
+                        <tbody id="studentsTableBody">
                             @{
                                 int counter2 = 0;
                                 foreach (var student in Model.Students)
                                 {
-                                    var currentMark = $"StudentMarks[{counter2}].MarksObtained";
                                     <tr>
                                         <td>@student.Name</td>
                                         <td>@student.RollNum</td>
-                                        <td><input asp-for="@currentMark" type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
+                                        <td><input asp-for="Model.StudentMarks[{@counter2}].MarksObtained" type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
                                     </tr>
                                     counter2++;
                                 }
@@ -614,6 +615,44 @@
         </div>
     </div>
 
+    </div>
+
+    <br>
+    <hr />
+    <div class="container mt-5">
+
+        <div class="card">
+            <div class="card-header">
+                Attendance Sheet Report
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Registration No.</th>
+                            <th>Student Name</th>
+                            <th>Credit Hrs</th>
+                            <th>Total Classes</th>
+                            <th>Attended Classes</th>
+                            <th>Attendance %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var attendance in Model.AttendanceReport)
+                        {
+                            <tr>
+                                <td>@attendance.RegistrationNo</td>
+                                <td>@attendance.StudentName</td>
+                                <td>@attendance.CreditHours</td>
+                                <td>@attendance.TotalClasses</td>
+                                <td>@attendance.AttendedClasses</td>
+                                <td>@attendance.AttendancePercentage%</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 
@@ -704,7 +743,57 @@
                 `;
                 studentTbody.innerHTML += row;
             });
+
+
+            // Filter and display the students in the evaluation table
+            if (tableId === 'evaluationTable') {
+                const selectedSection = document.getElementById("section-select").value;
+                const students = Model.Students;
+                const filteredStudents = students.filter(student => student.section === selectedSection);
+
+                const studentTbody = document.querySelector("table.table-bordered tbody");
+                studentTbody.innerHTML = "";
+
+                filteredStudents.forEach(student => {
+                    const row = `
+                <tr>
+                  <td>${student.Name}</td>
+                  <td>${student.RollNum}</td>
+                  <td>
+                    <input name="StudentMarks[${student.RollNum}]" type="number" class="form-control" placeholder="Marks Obtained">
+                  </td>
+                </tr>
+              `;
+                    studentTbody.innerHTML += row;
+                });
+            }
         }
+
+        function filterMarks(section, tableId) {
+            // Get the table body element
+            var tableBody = document.getElementById("studentsTableBody");
+
+            // Remove all existing rows from the table body
+            while (tableBody.firstChild) {
+                tableBody.removeChild(tableBody.firstChild);
+            }
+
+            // Filter the students by section
+            var studentsInSection = @Html.Raw(Json.Serialize(Model.studentsInSecton));
+            var selectedSection = studentsInSection.find(s => s.section == section);
+            var students = selectedSection ? selectedSection.students : [];
+
+            // Add rows for the filtered students to the table body
+            students.forEach(function (student) {
+                var newRow = tableBody.insertRow();
+                var nameCell = newRow.insertCell();
+                var rollNumCell = newRow.insertCell();
+
+                nameCell.innerHTML = student.name;
+                rollNumCell.innerHTML = student.rollNum;
+            });
+        }
+
 
         function filterCourses() {
             const searchInput = document.getElementById('searchInput');

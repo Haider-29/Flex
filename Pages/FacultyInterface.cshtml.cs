@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
+using System.Linq;
 
 namespace FLEXX.Pages
 {
@@ -28,6 +29,13 @@ namespace FLEXX.Pages
 
         public string? section { get; set; }
 
+    }
+
+
+    public class StudentOnSection
+    {
+        public string? section { get; set; }
+        public List<Student> students { get; set; }
     }
 
 
@@ -62,7 +70,9 @@ namespace FLEXX.Pages
         {
             public int MarksObtained { get; set; }
             public int TotalMarks { get; set; }
-        }
+
+            public string? id { get; set; }
+         }
 
         [BindProperty]
 
@@ -73,6 +83,8 @@ namespace FLEXX.Pages
         public int NEvaluationNumber { get; set; }
         [BindProperty]
         public List<StudentMark> StudentMarks { get; set; }
+
+
 
         public List<MarksDistributionTable> AssignedSections { get; set; }
 
@@ -96,6 +108,8 @@ namespace FLEXX.Pages
         public string SectionId { get; set; }
 
         public List<Student> Students { get; set; }
+
+        public List<StudentOnSection> studentsInSecton { get; set; }
         [BindProperty]
         public string TeacherEmail { get; set; }
 
@@ -275,7 +289,7 @@ namespace FLEXX.Pages
                     idcommand.Dispose();
                     cmd.Parameters.Clear();
                     cmd.Parameters.AddWithValue("@MarksID", marksID); // Generate a unique ID for the Marks record
-                    cmd.Parameters.AddWithValue("@StudentID", StudentIds[i]);
+                    cmd.Parameters.AddWithValue("@StudentID", StudentMarks[i].id);
                     cmd.Parameters.AddWithValue("@EvaluationType", SelectedEvaluationType);
                     cmd.Parameters.AddWithValue("@EvaluationID", evaluationId);
                     cmd.Parameters.AddWithValue("@Score", StudentMarks[i].MarksObtained);
@@ -432,7 +446,17 @@ namespace FLEXX.Pages
 
         }
 
+        public IList<AttendanceModel> AttendanceReport { get; set; }
 
+        public class AttendanceModel
+        {
+            public int RegistrationNo { get; set; }
+            public string StudentName { get; set; }
+            public int CreditHours { get; set; }
+            public int TotalClasses { get; set; }
+            public int AttendedClasses { get; set; }
+            public double AttendancePercentage { get; set; }
+        }
 
         [HttpGet]
         public async Task OnGetAsync(string email, string password)
@@ -533,7 +557,9 @@ namespace FLEXX.Pages
                 cum.Parameters.AddWithValue("@TeacherEmail", TeacherEmail);
                 SqlDataReader readStudents = await cum.ExecuteReaderAsync();
                 Students = new List<Student>();
-                while (await  readStudents.ReadAsync())
+                StudentMarks = new List<StudentMark>();
+                List<string> tempStudentIds = new List<string>(); // Add this line
+                while (await readStudents.ReadAsync())
                 {
                     Student student = new Student()
                     {
@@ -543,16 +569,82 @@ namespace FLEXX.Pages
                         section = readStudents.GetString(2)
 
                     };
+                    tempStudentIds.Add(readStudents.GetString(0)); // Add this line
                     Students.Add(student);
                 }
 
-                Console.Write("Students: ", Students);
-                StudentIds = new string[Students.Count];
+                studentsInSecton = new List<StudentOnSection>();
+
+                studentsInSecton = Students
+    .GroupBy(s => s.section)
+    .Select(g => new StudentOnSection
+    {
+        section = g.Key,
+        students = g.ToList()
+    })
+    .ToList();
+
+
+                StudentIds = tempStudentIds.ToArray(); // Add this line
+
+                for (int i = 0; i < StudentIds.Length; i++)
+                {
+                    StudentMark studentMark = new StudentMark { 
+                        id = StudentIds[i],
+                    };
+
+
+                    StudentMarks.Add(studentMark);
+
+
+                }
 
                 // get students of a sections
                 readStudents.Close();
                 cum.Dispose();
 
+                AttendanceReport = new List<AttendanceModel>();
+
+                query = @"
+    SELECT r.RegistrationID, u.FName + ' ' + u.LName as StudentName, c.CreditHours,
+           COUNT(*) as TotalClasses,
+           SUM(CASE WHEN a.Status = 'Present' THEN 1 ELSE 0 END) as AttendedClasses
+    FROM Attendance a
+    INNER JOIN Registration r ON a.StudentID = r.StudentID AND a.CourseID = r.OffCourseID
+    INNER JOIN student_section ss ON r.StudentID = ss.STUDENTID AND a.SectionID = ss.sectionid
+    INNER JOIN Section s ON a.SectionID = s.SectionID
+    INNER JOIN users u ON r.StudentID = u.Username
+    INNER JOIN Course c ON a.CourseID = c.CourseCode
+    GROUP BY r.RegistrationID, u.FName, u.LName, c.CreditHours
+    ORDER BY r.RegistrationID";
+
+
+                SqlCommand command = new SqlCommand(query, connection);
+                reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    int registrationNo = reader.GetInt32(0);
+                    string studentName = reader.GetString(1);
+                    int creditHours = reader.GetInt32(2);
+                    int totalClasses = reader.GetInt32(3);
+                    int attendedClasses = reader.GetInt32(4);
+                    double attendancePercentage = (double)attendedClasses / totalClasses * 100;
+
+                    AttendanceReport.Add(new AttendanceModel
+                    {
+                        RegistrationNo = registrationNo,
+                        StudentName = studentName,
+                        CreditHours = creditHours,
+                        TotalClasses = totalClasses,
+                        AttendedClasses = attendedClasses,
+                        AttendancePercentage = Math.Round(attendancePercentage, 2)
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
 
                 connection.Close();
             }

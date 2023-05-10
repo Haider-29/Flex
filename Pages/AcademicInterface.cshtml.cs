@@ -458,6 +458,36 @@ namespace FLEXX.Pages
 
         public List<AFaculty> aFaculty { get; set; }
 
+        public class CourseModel
+        {
+            public string CourseCode { get; set; }
+            public string CourseName { get; set; }
+            public int CreditHours { get; set; }
+        }
+        public IDictionary<string, IList<CourseModel>> CoursesBySemester { get; set; }
+        public IDictionary<string, IList<StudentModel>> StudentsBySection { get; set; }
+
+        public class StudentModel
+        {
+            public int RegistrationNo { get; set; }
+            public string StudentName { get; set; }
+        }
+
+        public IList<CourseAllocationModel> CourseAllocations { get; set; }
+
+        public class CourseAllocationModel
+        {
+            public string CourseCode { get; set; }
+            public string CourseName { get; set; }
+            public int CreditHours { get; set; }
+            public IList<CourseSectionModel> Sections { get; set; }
+        }
+
+        public class CourseSectionModel
+        {
+            public string SectionID { get; set; }
+            public string InstructorName { get; set; }
+        }
         public async Task OnGetAsync(string email, string password)
         {
 
@@ -584,6 +614,119 @@ namespace FLEXX.Pages
 
                 reader5.Close();
                 cmd5.Dispose();
+
+
+                CoursesBySemester = new Dictionary<string, IList<CourseModel>>();
+
+                query = @"SELECT oc.Semester, c.CourseCode, c.CourseName, c.CreditHours
+            FROM Offered_Course oc
+            INNER JOIN Course c ON oc.OfferedCourseID = c.CourseCode
+            ORDER BY oc.Semester";
+
+                SqlCommand command = new SqlCommand(query, conn);
+                reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string semester = reader.GetString(0);
+                    if (!CoursesBySemester.ContainsKey(semester))
+                    {
+                        CoursesBySemester[semester] = new List<CourseModel>();
+                    }
+
+                    CoursesBySemester[semester].Add(new CourseModel
+                    {
+                        CourseCode = reader.GetString(1),
+                        CourseName = reader.GetString(2),
+                        CreditHours = reader.GetInt32(3)
+                    });
+                }
+
+                reader.Close();
+                command.Dispose();
+
+
+                StudentsBySection = new Dictionary<string, IList<StudentModel>>();
+
+                query = @"
+    SELECT s.SectionID, r.RegistrationID, u.FName, u.LName
+    FROM student_section ss
+    INNER JOIN Section s ON ss.sectionid = s.SectionID
+    INNER JOIN Registration r ON ss.STUDENTID = r.StudentID
+    INNER JOIN Users u ON r.StudentID = u.username
+    ORDER BY r.RegistrationID";
+
+                command = new SqlCommand(query, conn);
+                reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string section = reader.GetString(0);
+                    if (!StudentsBySection.ContainsKey(section))
+                    {
+                        StudentsBySection[section] = new List<StudentModel>();
+                    }
+
+                    StudentsBySection[section].Add(new StudentModel
+                    {
+                        RegistrationNo = reader.GetInt32(1),
+                        StudentName = reader.GetString(2) + ' ' + reader.GetString(3),
+
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
+
+
+                CourseAllocations = new List<CourseAllocationModel>();
+
+                query = @"
+            SELECT oc.OfferedCourseID, c.CourseName, c.CreditHours, s.SectionID, u.FName + ' ' + u.LName as InstructorName
+            FROM Offered_Course oc
+            INNER JOIN Section s ON oc.OfferedCourseID = s.OfferedCourseID
+            INNER JOIN users u ON s.FacultyID = u.Username
+            INNER JOIN Course c ON oc.OfferedCourseID = c.CourseCode
+            ORDER BY oc.OfferedCourseID, s.SectionID";
+
+                command = new SqlCommand(query, conn);
+                reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    string courseCode = reader.GetString(0);
+                    string courseName = reader.GetString(1);
+                    int creditHours = reader.GetInt32(2);
+                    string sectionId = reader.GetString(3);
+                    string instructorName = reader.GetString(4);
+
+                    // Check if we already have a course allocation for this course code
+                    CourseAllocationModel courseAllocation = CourseAllocations
+                        .FirstOrDefault(c => c.CourseCode == courseCode);
+
+                    if (courseAllocation == null)
+                    {
+                        // If not, create a new course allocation
+                        courseAllocation = new CourseAllocationModel
+                        {
+                            CourseCode = courseCode,
+                            CourseName = courseName,
+                            CreditHours = creditHours,
+                            Sections = new List<CourseSectionModel>()
+                        };
+                        CourseAllocations.Add(courseAllocation);
+                    }
+
+                    // Add the section to the course allocation
+                    courseAllocation.Sections.Add(new CourseSectionModel
+                    {
+                        SectionID = sectionId,
+                        InstructorName = instructorName
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
 
                 conn.Close();
             }
