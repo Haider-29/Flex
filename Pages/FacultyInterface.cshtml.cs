@@ -489,6 +489,26 @@ namespace FLEXX.Pages
         public List<GradeReportModel> GradeReport { get; set; } = new List<GradeReportModel>();
 
         public List<GradeCountModel> GradeCountReport { get; set; } = new List<GradeCountModel>();
+        public class FeedbackReportItem
+        {
+            public string StudentId { get; set; }
+            public string FeedbackFormData { get; set; }
+            public float AppearanceScore { get; set; }
+            public float ProfessionalScore { get; set; }
+            public float TeachingMethodsScore { get; set; }
+            public float DispositionScore { get; set; }
+            public float OverallScore { get; set; }
+        }
+
+        public class FeedbackReportViewModel
+        {
+            public string TeacherId { get; set; }
+            public List<FeedbackReportItem> FeedbackItems { get; set; }
+        }
+
+
+        public List<FeedbackReportViewModel> FeedbackReport { get; set; } = new List<FeedbackReportViewModel>();
+
 
         [HttpGet]
         public async Task OnGetAsync(string email, string password)
@@ -729,7 +749,55 @@ ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
                 command.Dispose();
 
 
+                // student feedbasck rfeport:
+                query = "SELECT StudentID, FeedbackFormData FROM Feedback WHERE FacultyID = @TeacherId;";
+                cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@TeacherId", TeacherEmail);
 
+                reader = await cmd.ExecuteReaderAsync();
+
+                List<FeedbackReportItem> feedbackItems = new List<FeedbackReportItem>();
+
+                while (await reader.ReadAsync())
+                {
+                    string studentId = reader.GetString(0);
+                    string feedbackFormData = reader.GetString(1);
+
+                    // Parse the feedback form data
+                    string[] values = feedbackFormData.Split(',');
+
+                    float appearanceScore = (float.Parse(values[0]) + float.Parse(values[1]) + float.Parse(values[2]) + float.Parse(values[3]) + float.Parse(values[4])) / 5;
+                    float professionalScore = (float.Parse(values[5]) + float.Parse(values[6]) + float.Parse(values[7]) + float.Parse(values[8]) + float.Parse(values[9]) + float.Parse(values[10])) / 6;
+                    float teachingMethodsScore = (float.Parse(values[11]) + float.Parse(values[12]) + float.Parse(values[13]) + float.Parse(values[14]) + float.Parse(values[15])) / 5;
+                    float dispositionScore = (float.Parse(values[16]) + float.Parse(values[17]) + float.Parse(values[18]) + float.Parse(values[19])) / 4;
+                    float overallScore = (appearanceScore + professionalScore + teachingMethodsScore + dispositionScore) / 4;
+
+                    FeedbackReportItem item = new FeedbackReportItem
+                    {
+                        StudentId = studentId,
+                        FeedbackFormData = feedbackFormData,
+                        AppearanceScore = appearanceScore,
+                        ProfessionalScore = professionalScore,
+                        TeachingMethodsScore = teachingMethodsScore,
+                        DispositionScore = dispositionScore,
+                        OverallScore = overallScore
+                    };
+
+                    feedbackItems.Add(item);
+
+                    FeedbackReportViewModel ok = new FeedbackReportViewModel
+                    {
+                        TeacherId = TeacherEmail,
+                        FeedbackItems = feedbackItems
+                    };
+
+                    FeedbackReport.Add(ok);
+                }
+
+
+
+                reader.Close();
+                cmd.Dispose();
 
                 connection.Close();
             }
