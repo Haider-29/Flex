@@ -636,14 +636,13 @@
                 <form method="post" asp-page-handler="AddFeedback">
                     <div class="form-group">
                         <label for="courseSelect">Select a course:</label>
-                        <select class="form-control" id="courseSelect" asp-for="FeedbackCourseId">
+                        <select class="form-control" id="courseSelect" name="feedbackCID">
                             @foreach (var course in Model.enrolledCourses)
                             {
                                 <option value="@course.id">@course.id - @course.name</option>
                             }
                         </select>
                     </div>
-                    </form>
                     <p><b>
                         Please fill out the form in evaluating your instructor for the semester. After completion, please press the submit button.
                         <br><br>
@@ -886,12 +885,14 @@
                             </table>
                         </div>
                     </li>
-                    <li class="form-line" data-type="control_textarea" id="id_15">
+                    <li class="form-line" data-type="control_textarea" id="id_15" name="feedback-comments">
                         <label class="form-label form-label-top form-label-auto" id="label_15" for="input_15"> Comments </label>
                         <div id="cid_15" class="form-input-wide"> <textarea id="input_15" class="form-textarea" name="q15_comments" cols="62" rows="6" data-component="textarea" aria-labelledby="label_15"></textarea> </div>
                     </li>
                     </ol>
                 <button type="submit" class="btn btn-primary" style="margin-left: 45%;">Submit</button>
+                </form>
+
                 </div>
             </div>
         </div>

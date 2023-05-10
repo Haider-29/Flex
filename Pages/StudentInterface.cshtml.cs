@@ -146,6 +146,10 @@ namespace FLEXX.Pages
         [BindProperty]
         public string FeedbackCourseId { get; set; }
 
+        [BindProperty]
+
+        public string FeedbackComment { get; set; }
+
 
         [BindProperty]
 
@@ -162,10 +166,29 @@ namespace FLEXX.Pages
         }
 
 
+
         public async Task<IActionResult> OnPostAddFeedbackAsync()
         {
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
+            FeedbackFormData = Request.Form["q11_appearanceAnd11[0]"] + "," + Request.Form["q11_appearanceAnd11[1]"] + "," + Request.Form["q11_appearanceAnd11[2]"] + "," + Request.Form["q11_appearanceAnd11[3]"]
+
+
+              +  "," + Request.Form["q11_appearanceAnd11[4]"] +  "," + Request.Form["q12_professionalPractices[0]"] + "," + Request.Form["q12_professionalPractices[1]"]
+              + "," + Request.Form["q12_professionalPractices[2]"] + "," + Request.Form["q12_professionalPractices[3]"] + "," + Request.Form["q12_professionalPractices[4]"]
+              + "," + Request.Form["q12_professionalPractices[5]"] + "," + Request.Form["q13_teachingMethods[0]"] + "," + Request.Form["q13_teachingMethods[1]"]
+              + "," + Request.Form["q13_teachingMethods[2]"] + "," + Request.Form["q13_teachingMethods[3]"] + "," + Request.Form["q13_teachingMethods[4]"]
+              + "," + Request.Form["q14_dispositionTowards[0]"] + "," + Request.Form["q14_dispositionTowards[1]"] + "," + Request.Form["q14_dispositionTowards[2]"]
+              + "," + Request.Form["q14_dispositionTowards[3]"]
+
+                ;
+            FeedbackComment = Request.Form["feedback-comments"];
+
+            if (FeedbackComment == null)
+            {
+                FeedbackComment = "No Comment";
+            }
+            FeedbackCourseId = Request.Form["feedbackCID"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
@@ -186,32 +209,45 @@ namespace FLEXX.Pages
                     FeedbackMessage = "An error occurred while getting the FeedbackID: " + ex.Message;
                     return Page();
                 }
-
+                cmd.Dispose();
                 // Fetch the FacultyID teaching the selected course
                 query = "SELECT FacultyID FROM Section WHERE OfferedCourseID = @CourseId;";
                 cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@CourseId", FeedbackCourseId);
 
-                string facultyId; // Will store the fetched FacultyID
 
-                try
+                Console.Write(FeedbackCourseId);
+
+                string facultyId; // Will store the fetched FacultyID
+              
+                 
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                if (reader.Read())
                 {
-                    object result = await cmd.ExecuteScalarAsync();
-                    facultyId = Convert.ToString(result);
+                    facultyId = reader.GetString(0);
+
                 }
-                catch (SqlException ex)
+                else
                 {
-                    FeedbackMessage = "An error occurred while getting the FacultyID: " + ex.Message;
-                    return Page();
+                    facultyId = "";
                 }
+                Console.Write(facultyId);
+                    reader.Close();
+
+                    cmd.Dispose();
+               
+      
+                
 
                 // Create a new feedback
-                query = "INSERT INTO Feedback (FeedbackID, StudentID, FacultyID, FeedbackFormData) VALUES(@FeedbackID, @StudentID, @FacultyID, @FeedbackFormData);";
+                query = "INSERT INTO Feedback (FeedbackID, StudentID, FacultyID, FeedbackFormData, Comments) VALUES(@FeedbackID, @StudentID, @FacultyID, @FeedbackFormData, @Comments);";
                 cmd = new SqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@FeedbackID", feedbackId);
                 cmd.Parameters.AddWithValue("@StudentID", HttpContext.Session.GetString("StudentID"));
                 cmd.Parameters.AddWithValue("@FacultyID", facultyId);
                 cmd.Parameters.AddWithValue("@FeedbackFormData", FeedbackFormData);
+                cmd.Parameters.AddWithValue("@Comments", FeedbackComment);
 
                 try
                 {
@@ -227,9 +263,12 @@ namespace FLEXX.Pages
                 }
                 catch (SqlException ex)
                 {
+
+                    Console.WriteLine(ex.Message);
                     // Handle specific SQL exceptions here
                     FeedbackMessage = "An error occurred while submitting the feedback: " + ex.Message;
                 }
+                cmd.Dispose();
 
                 connection.Close();
             }
