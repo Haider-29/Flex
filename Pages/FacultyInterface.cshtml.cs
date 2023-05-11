@@ -217,7 +217,8 @@ namespace FLEXX.Pages
             }
         }
 
-
+        // Look here Haider
+        // ye function call hota wehn save marks button is pressed
         public async Task<IActionResult> OnPostSaveSectionEvaluationAsync()
         {
             // You need to get the necessary input data from the form
@@ -511,7 +512,8 @@ namespace FLEXX.Pages
 
         public List<FeedbackReportViewModel> FeedbackReport { get; set; } = new List<FeedbackReportViewModel>();
 
-
+        // Look here Haider
+        // OnGEtAsync may maybe issue ho with the way indexes are being handled for lists
         [HttpGet]
         public async Task OnGetAsync(string email, string password)
         {
