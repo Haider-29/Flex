@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Linq;
+using OfficeOpenXml;
+using System.IO;
 
 namespace FLEXX.Pages
 {
@@ -661,18 +663,21 @@ namespace FLEXX.Pages
                 AttendanceReport = new List<AttendanceModel>();
 
                 query = @"
-    SELECT r.RegistrationID, u.FName + ' ' + u.LName as StudentName, c.CreditHours,
-           COUNT(*) as TotalClasses,
-           SUM(CASE WHEN a.Status = 'Present' THEN 1 ELSE 0 END) as AttendedClasses
-    FROM Attendance a
-    INNER JOIN Registration r ON a.StudentID = r.StudentID AND a.CourseID = r.OffCourseID
-    INNER JOIN student_section ss ON r.StudentID = ss.STUDENTID AND a.SectionID = ss.sectionid
-    INNER JOIN Section s ON a.SectionID = s.SectionID
-    INNER JOIN users u ON r.StudentID = u.Username
-    INNER JOIN Course c ON a.CourseID = c.CourseCode
-    WHERE s.FacultyID = @FacultyID
-    GROUP BY r.RegistrationID, u.FName, u.LName, c.CreditHours
-    ORDER BY r.RegistrationID";
+
+                    SELECT r.RegistrationID, u.FName + ' ' + u.LName as StudentName, c.CreditHours,
+                           COUNT(*) as TotalClasses,
+                           SUM(CASE WHEN a.Status = 'Present' THEN 1 ELSE 0 END) as AttendedClasses
+                    FROM Attendance a
+                    INNER JOIN Registration r ON a.StudentID = r.StudentID AND a.CourseID = r.OffCourseID
+                    INNER JOIN student_section ss ON r.StudentID = ss.STUDENTID AND a.SectionID = ss.sectionid
+                    INNER JOIN Section s ON a.SectionID = s.SectionID
+                    INNER JOIN users u ON r.StudentID = u.Username
+                    INNER JOIN Course c ON a.CourseID = c.CourseCode
+                    WHERE s.FacultyID = @FacultyID
+                    GROUP BY r.RegistrationID, u.FName, u.LName, c.CreditHours
+                    ORDER BY r.RegistrationID
+
+                ";
 
 
 
@@ -708,21 +713,22 @@ namespace FLEXX.Pages
                 reader.Close();
                 command.Dispose();
                 query = @"
-SELECT u.FName + ' ' + u.LName AS StudentName, 
-       m.EvaluationType, 
-       e.EvaluationNumber,
-       e.MaxMarks, 
-       m.Score AS Score, 
-       (CAST(m.Score AS FLOAT) / e.MaxMarks) * 100 AS Percentage
-FROM Marks m
-INNER JOIN Users u ON m.StudentID = u.Username
-INNER JOIN Evaluation e ON m.EvaluationID = e.EvaluationID
-INNER JOIN Section s ON e.SectionID = s.SectionID
-INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
-WHERE s.FacultyID = @FacultyID
-ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
+                    SELECT u.FName + ' ' + u.LName AS StudentName, 
+                           m.EvaluationType, 
+                           e.EvaluationNumber,
+                           e.MaxMarks, 
+                           m.Score AS Score, 
+                           (CAST(m.Score AS FLOAT) / e.MaxMarks) * 100 AS Percentage
+                    FROM Marks m
+                    INNER JOIN Users u ON m.StudentID = u.Username
+                    INNER JOIN Evaluation e ON m.EvaluationID = e.EvaluationID
+                    INNER JOIN Section s ON e.SectionID = s.SectionID
+                    INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
+                    WHERE s.FacultyID = @FacultyID
+                    ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber
+                ";
                 command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@FacultyID", TeacherEmail);  // Set the Faculty ID
+                command.Parameters.AddWithValue("@FacultyID", HttpContext.Session.GetString("UserName"));  // Set the Faculty ID
                 reader = await command.ExecuteReaderAsync();
 
                 while (await reader.ReadAsync())
@@ -805,6 +811,196 @@ ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
 
         }
 
+        public async Task<IActionResult> OnPostGenerateAttendanceReportAsync()
+        {
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                AttendanceReport = new List<AttendanceModel>();
+
+                string query = @"
+
+                    SELECT r.RegistrationID, u.FName + ' ' + u.LName as StudentName, c.CreditHours,
+                           COUNT(*) as TotalClasses,
+                           SUM(CASE WHEN a.Status = 'Present' THEN 1 ELSE 0 END) as AttendedClasses
+                    FROM Attendance a
+                    INNER JOIN Registration r ON a.StudentID = r.StudentID AND a.CourseID = r.OffCourseID
+                    INNER JOIN student_section ss ON r.StudentID = ss.STUDENTID AND a.SectionID = ss.sectionid
+                    INNER JOIN Section s ON a.SectionID = s.SectionID
+                    INNER JOIN users u ON r.StudentID = u.Username
+                    INNER JOIN Course c ON a.CourseID = c.CourseCode
+                    WHERE s.FacultyID = @FacultyID
+                    GROUP BY r.RegistrationID, u.FName, u.LName, c.CreditHours
+                    ORDER BY r.RegistrationID
+
+                ";
+
+
+
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FacultyID", HttpContext.Session.GetString("UserName"));
+
+
+
+
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    int registrationNo = reader.GetInt32(0);
+                    string studentName = reader.GetString(1);
+                    int creditHours = reader.GetInt32(2);
+                    int totalClasses = reader.GetInt32(3);
+                    int attendedClasses = reader.GetInt32(4);
+                    double attendancePercentage = (double)attendedClasses / totalClasses * 100;
+
+                    AttendanceReport.Add(new AttendanceModel
+                    {
+                        RegistrationNo = registrationNo,
+                        StudentName = studentName,
+                        CreditHours = creditHours,
+                        TotalClasses = totalClasses,
+                        AttendedClasses = attendedClasses,
+                        AttendancePercentage = Math.Round(attendancePercentage, 2)
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
+                connection.Close();
+            }
+            using (var package = new ExcelPackage())
+            {
+                // Add a new worksheet to the package
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Attendance Report");
+
+                // Set the header row values
+                worksheet.Cells[1, 1].Value = "Registration No";
+                worksheet.Cells[1, 2].Value = "Student Name";
+                worksheet.Cells[1, 3].Value = "Credit Hours";
+                worksheet.Cells[1, 4].Value = "Total Classes";
+                worksheet.Cells[1, 5].Value = "Attended Classes";
+                worksheet.Cells[1, 6].Value = "Attendance Percentage";
+
+                // Loop through the AttendanceReport list and add the data to the worksheet
+                int row = 2;
+                foreach (AttendanceModel attendance in AttendanceReport)
+                {
+                    worksheet.Cells[row, 1].Value = attendance.RegistrationNo;
+                    worksheet.Cells[row, 2].Value = attendance.StudentName;
+                    worksheet.Cells[row, 3].Value = attendance.CreditHours;
+                    worksheet.Cells[row, 4].Value = attendance.TotalClasses;
+                    worksheet.Cells[row, 5].Value = attendance.AttendedClasses;
+                    worksheet.Cells[row, 6].Value = attendance.AttendancePercentage;
+
+                    row++;
+                }
+
+                // Convert the Excel package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+                await OnGetAsync(TeacherEmail, TeacherPassword);
+                // Download the file
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AttendanceReport.xlsx");
+            }
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateEvaluationReportAsync()
+        {
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                string query = @"
+                    SELECT u.FName + ' ' + u.LName AS StudentName, 
+                           m.EvaluationType, 
+                           e.EvaluationNumber,
+                           e.MaxMarks, 
+                           m.Score AS Score, 
+                           (CAST(m.Score AS FLOAT) / e.MaxMarks) * 100 AS Percentage
+                    FROM Marks m
+                    INNER JOIN Users u ON m.StudentID = u.Username
+                    INNER JOIN Evaluation e ON m.EvaluationID = e.EvaluationID
+                    INNER JOIN Section s ON e.SectionID = s.SectionID
+                    INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
+                    WHERE s.FacultyID = @FacultyID
+                    ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber
+                ";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@FacultyID", HttpContext.Session.GetString("UserName"));  // Set the Faculty ID
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    string studentName = reader.GetString(0);
+                    string evt = reader.GetString(1);
+                    int evn = reader.GetInt32(2);
+                    int maxMarks = reader.GetInt32(3);
+                    int score = reader.GetInt32(4);
+                    double percentage = reader.GetDouble(5);
+
+                    EvaluationReport.Add(new EvaluationReportModel
+                    {
+                        StudentName = studentName,
+                        EvaluationType = evt,
+                        EvaluationNumber = evn,
+                        MaxMarks = maxMarks,
+                        Score = score,
+                        Percentage = Math.Round(percentage, 2)
+                    });
+                }
+
+                reader.Close();
+                command.Dispose();
+                connection.Close();
+            }
+            {
+                using var package = new ExcelPackage();
+
+                // Add a new worksheet to the workbook
+                var worksheet = package.Workbook.Worksheets.Add("Evaluation Report");
+
+                // Add column headers to the worksheet
+                worksheet.Cells[1, 1].Value = "Student Name";
+                worksheet.Cells[1, 2].Value = "Evaluation Type";
+                worksheet.Cells[1, 3].Value = "Evaluation Number";
+                worksheet.Cells[1, 4].Value = "Max Marks";
+                worksheet.Cells[1, 5].Value = "Score";
+                worksheet.Cells[1, 6].Value = "Percentage";
+
+                // Loop through each EvaluationReportModel and add its data to the worksheet
+                int rowIndex = 2;
+                foreach (var evaluation in EvaluationReport)
+                {
+                    worksheet.Cells[rowIndex, 1].Value = evaluation.StudentName;
+                    worksheet.Cells[rowIndex, 2].Value = evaluation.EvaluationType;
+                    worksheet.Cells[rowIndex, 3].Value = evaluation.EvaluationNumber;
+                    worksheet.Cells[rowIndex, 4].Value = evaluation.MaxMarks;
+                    worksheet.Cells[rowIndex, 5].Value = evaluation.Score;
+                    worksheet.Cells[rowIndex, 6].Value = evaluation.Percentage;
+
+                    rowIndex++;
+                }
+
+                // Auto-fit the columns in the worksheet
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Convert the Excel package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+
+                // Download the file as an Excel file
+
+                await OnGetAsync(TeacherEmail, TeacherPassword);
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "EvaluationReport.xlsx");
+            }
+        }
+
 
         public async Task<IActionResult> OnPostFilterSectionAsync()
         {
@@ -836,8 +1032,36 @@ ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
                 command.Dispose();
                 connection.Close();
             }
-            await OnGetAsync(TeacherEmail, TeacherPassword);
-            return Page();
+
+
+            using (var package = new ExcelPackage())
+            {
+                // Add a new worksheet to the package
+                var worksheet = package.Workbook.Worksheets.Add("Grade Count Report");
+
+                // Add headers to the worksheet
+                worksheet.Cells[1, 1].Value = "Grade";
+                worksheet.Cells[1, 2].Value = "Count";
+
+                // Add data to the worksheet
+                int rowIndex = 2;
+                foreach (var gradeCount in GradeCountReport)
+                {
+                    worksheet.Cells[rowIndex, 1].Value = gradeCount.Grade;
+                    worksheet.Cells[rowIndex, 2].Value = gradeCount.Count;
+                    rowIndex++;
+                }
+
+                // Auto-fit columns
+                worksheet.Cells.AutoFitColumns();
+
+                // Convert the package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+                await OnGetAsync(TeacherEmail, TeacherPassword);
+                // Return the byte array as a file download
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "GradeCountReport.xlsx");
+            }
+          
         }
 
         public async Task<IActionResult> OnPostFilterCourseAsync()
@@ -848,14 +1072,17 @@ ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
 
             // Run the query with the selected course
             var query = @"
-        SELECT u.Username AS RollNo, u.FName + ' ' + u.LName AS Name, 
-               s.SectionID AS Section, ss.grade AS Grade
-        FROM student_section ss
-        INNER JOIN Users u ON ss.STUDENTID = u.Username
-        INNER JOIN Section s ON ss.sectionid = s.SectionID
-        INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
-        WHERE s.FacultyID = @FacultyID AND oc.OfferedCourseID = @CourseID
-        ORDER BY u.Username, s.SectionID";
+
+                SELECT u.Username AS RollNo, u.FName + ' ' + u.LName AS Name, 
+                       s.SectionID AS Section, ss.grade AS Grade
+                FROM student_section ss
+                INNER JOIN Users u ON ss.STUDENTID = u.Username
+                INNER JOIN Section s ON ss.sectionid = s.SectionID
+                INNER JOIN Offered_Course oc ON s.OfferedCourseID = oc.OfferedCourseID
+                WHERE s.FacultyID = @FacultyID AND oc.OfferedCourseID = @CourseID
+                ORDER BY u.Username, s.SectionID
+
+            ";
 
 
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
@@ -888,14 +1115,39 @@ ORDER BY u.FName, u.LName, m.EvaluationType, e.EvaluationNumber";
                 connection.Close();
 
             } // Fetch the data and populate the GradeReport list
-            // ...
+              // ...
 
 
 
             // Render the view with the updated data
+            byte[] fileContents;
+
+            // Create a new Excel package
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Grade Report");
+
+            // Add headers to the worksheet
+            worksheet.Cells[1, 1].Value = "Roll No";
+            worksheet.Cells[1, 2].Value = "Name";
+            worksheet.Cells[1, 3].Value = "Section";
+            worksheet.Cells[1, 4].Value = "Grade";
+            // Add data to the worksheet
+            int row = 2;
+            foreach (var grade in GradeReport)
+            {
+                worksheet.Cells[row, 1].Value = grade.RollNo;
+                worksheet.Cells[row, 2].Value = grade.Name;
+                worksheet.Cells[row, 3].Value = grade.Section;
+                worksheet.Cells[row, 4].Value = grade.Grade;
+                row++;
+            }
+
+            // Convert the Excel package to a byte array
+            fileContents = package.GetAsByteArray();
 
             await OnGetAsync(TeacherEmail, TeacherPassword);
-            return Page();
+            return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Grade Report.xlsx");
+
         }
     }
 

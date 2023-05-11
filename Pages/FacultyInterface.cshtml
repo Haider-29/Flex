@@ -652,6 +652,11 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer">
+                <form method="post" asp-page-handler="GenerateAttendanceReport">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -689,6 +694,12 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer">
+                <form method="post" asp-page-handler="GenerateEvaluationReport">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                </form>
+            </div>
+
         </div>
     </div>
 

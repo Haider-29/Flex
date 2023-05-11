@@ -157,6 +157,9 @@ namespace FLEXX.Pages
         public string MarksCourseID { get; set; }
 
 
+
+
+
         public async Task<IActionResult> OnPostSetCourseIdAsync(string courseId)
         {
             HttpContext.Session.SetString("CourseID", courseId);

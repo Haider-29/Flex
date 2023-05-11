@@ -188,7 +188,7 @@
                     <form class="form-example" action="" method="post">
                         <div class="form-group">
                             <label for="courseSelect">Select a course:</label>
-                            <select class="form-control" id="courseSelectMarks">
+                        <select class="form-control" id="courseSelectMarks" onchange="onCourseSelect()">
                             @foreach (var course in Model.enrolledCourses)
                             {
                                 <option>@course.id - @course.name</option>
@@ -241,7 +241,7 @@
                                     <th>Maximum</th>
                                 </tr>0
                             </thead>
-                            <tbody>
+                            <tbody id="evaluationTableBody">
                                 @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Quiz"))
                                 {
                                     <tr>
@@ -271,7 +271,7 @@
                                     <th>Maximum</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody >
                                 @foreach (var eval in Model.allEvaluations.Where(e => e.courseCode == "CS-101" && e.evaluationType == "Assignment"))
                                 {
                                     <tr>
@@ -974,6 +974,12 @@
         </script>
 
     <script>
+
+        function onCourseSelect() {
+            var courseSelect = document.getElementById("courseSelectMarks");
+            var selectedCourseCode = courseSelect.options[courseSelect.selectedIndex].value;
+            window.location.href = "/Marks?courseCode=" + selectedCourseCode;
+        }
         function changeCardHeader(selectedCourseId) {
             const courseSelect = document.getElementById("courseSelectAttendance");
             const selectedOption = courseSelect.options[courseSelect.selectedIndex];
@@ -1060,6 +1066,8 @@
             dataRow.cells[5].innerText = `${evaluationData.min}`;
             dataRow.cells[6].innerText = `${evaluationData.max}`;
         }
+
+
 
 
 
