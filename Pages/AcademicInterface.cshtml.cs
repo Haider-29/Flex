@@ -1,8 +1,11 @@
 using System;
 using System.Data.SqlClient;
+using System.Reflection;
+using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using OfficeOpenXml;
 
 namespace FLEXX.Pages
 {
@@ -487,6 +490,252 @@ namespace FLEXX.Pages
         {
             public string SectionID { get; set; }
             public string InstructorName { get; set; }
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateCourseAllocationReportAsync()
+        {
+            CourseAllocations = new List<CourseAllocationModel>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                string query = @"
+            SELECT oc.OfferedCourseID, c.CourseName, c.CreditHours, s.SectionID, u.FName + ' ' + u.LName as InstructorName
+            FROM Offered_Course oc
+            INNER JOIN Section s ON oc.OfferedCourseID = s.OfferedCourseID
+            INNER JOIN users u ON s.FacultyID = u.Username
+            INNER JOIN Course c ON oc.OfferedCourseID = c.CourseCode
+            ORDER BY oc.OfferedCourseID, s.SectionID";
+
+                SqlCommand command = new SqlCommand(query, conn);
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    string courseCode = reader.GetString(0);
+                    string courseName = reader.GetString(1);
+                    int creditHours = reader.GetInt32(2);
+                    string sectionId = reader.GetString(3);
+                    string instructorName = reader.GetString(4);
+
+                    // Check if we already have a course allocation for this course code
+                    CourseAllocationModel courseAllocation = CourseAllocations
+                        .FirstOrDefault(c => c.CourseCode == courseCode);
+
+                    if (courseAllocation == null)
+                    {
+                        // If not, create a new course allocation
+                        courseAllocation = new CourseAllocationModel
+                        {
+                            CourseCode = courseCode,
+                            CourseName = courseName,
+                            CreditHours = creditHours,
+                            Sections = new List<CourseSectionModel>()
+                        };
+                        CourseAllocations.Add(courseAllocation);
+                    }
+
+                    // Add the section to the course allocation
+                    courseAllocation.Sections.Add(new CourseSectionModel
+                    {
+                        SectionID = sectionId,
+                        InstructorName = instructorName
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
+
+                conn.Close();
+            }
+
+
+            using (var package = new ExcelPackage())
+            {
+                var sheet = package.Workbook.Worksheets.Add("Course Allocations");
+                sheet.Cells["A1"].Value = "Course Code";
+                sheet.Cells["B1"].Value = "Course Name";
+                sheet.Cells["C1"].Value = "Credit Hours";
+                sheet.Cells["D1"].Value = "Section ID";
+                sheet.Cells["E1"].Value = "Instructor Name";
+
+                var row = 2;
+                foreach (var allocation in CourseAllocations)
+                {
+                    var courseCode = allocation.CourseCode;
+                    var courseName = allocation.CourseName;
+                    var creditHours = allocation.CreditHours;
+
+                    foreach (var section in allocation.Sections)
+                    {
+                        var sectionID = section.SectionID;
+                        var instructorName = section.InstructorName;
+
+                        sheet.Cells[$"A{row}"].Value = courseCode;
+                        sheet.Cells[$"B{row}"].Value = courseName;
+                        sheet.Cells[$"C{row}"].Value = creditHours;
+                        sheet.Cells[$"D{row}"].Value = sectionID;
+                        sheet.Cells[$"E{row}"].Value = instructorName;
+
+                        row++;
+                    }
+                }
+
+                // Convert the Excel package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+
+                // Set the content type and file name for the response
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = "CourseAllocationReport.xlsx";
+                await OnGetAsync(OfficerEmail, OfficerPassword);
+                // Return the Excel file as a download
+                return File(fileContents, contentType, fileName);
+            }
+
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateStudentSectionsReportAsync()
+        {
+            StudentsBySection = new Dictionary<string, IList<StudentModel>>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                string query = @"
+    SELECT s.SectionID, r.RegistrationID, u.FName, u.LName
+    FROM student_section ss
+    INNER JOIN Section s ON ss.sectionid = s.SectionID
+    INNER JOIN Registration r ON ss.STUDENTID = r.StudentID
+    INNER JOIN Users u ON r.StudentID = u.username
+    ORDER BY r.RegistrationID";
+
+                SqlCommand command = new SqlCommand(query, conn);
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string section = reader.GetString(0);
+                    if (!StudentsBySection.ContainsKey(section))
+                    {
+                        StudentsBySection[section] = new List<StudentModel>();
+                    }
+
+                    StudentsBySection[section].Add(new StudentModel
+                    {
+                        RegistrationNo = reader.GetInt32(1),
+                        StudentName = reader.GetString(2) + ' ' + reader.GetString(3),
+
+                    });
+                }
+
+
+                reader.Close();
+                command.Dispose();
+                conn.Close();
+            }
+            using (var package = new ExcelPackage())
+            {
+                foreach (var sectionName in StudentsBySection.Keys)
+                {
+                    var students = StudentsBySection[sectionName];
+
+                    var sheet = package.Workbook.Worksheets.Add(sectionName);
+                    sheet.Cells["A1"].Value = "Registration No";
+                    sheet.Cells["B1"].Value = "Student Name";
+
+                    var row = 2;
+                    foreach (var student in students)
+                    {
+                        sheet.Cells[$"A{row}"].Value = student.RegistrationNo;
+                        sheet.Cells[$"B{row}"].Value = student.StudentName;
+                        row++;
+                    }
+                }
+
+                // Convert the Excel package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+
+                // Set the content type and file name for the response
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = "StudentSectionsReport.xlsx";
+                await OnGetAsync(OfficerEmail, OfficerPassword);
+                // Return the Excel file as a download
+                return File(fileContents, contentType, fileName);
+            }
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateOfferedCoursesReportAsync()
+        {
+            CoursesBySemester = new Dictionary<string, IList<CourseModel>>();
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                string query = @"SELECT oc.Semester, c.CourseCode, c.CourseName, c.CreditHours
+            FROM Offered_Course oc
+            INNER JOIN Course c ON oc.OfferedCourseID = c.CourseCode
+            ORDER BY oc.Semester";
+
+                SqlCommand command = new SqlCommand(query, conn);
+                SqlDataReader reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    string semester = reader.GetString(0);
+                    if (!CoursesBySemester.ContainsKey(semester))
+                    {
+                        CoursesBySemester[semester] = new List<CourseModel>();
+                    }
+
+                    CoursesBySemester[semester].Add(new CourseModel
+                    {
+                        CourseCode = reader.GetString(1),
+                        CourseName = reader.GetString(2),
+                        CreditHours = reader.GetInt32(3)
+                    });
+                }
+
+                reader.Close();
+                command.Dispose();
+                conn.Close();
+            }
+            using (var package = new ExcelPackage())
+            {
+                foreach (var semesterName in CoursesBySemester.Keys)
+                {
+                    var courses = CoursesBySemester[semesterName];
+
+                    var sheet = package.Workbook.Worksheets.Add(semesterName);
+                    sheet.Cells["A1"].Value = "Course Code";
+                    sheet.Cells["B1"].Value = "Course Name";
+                    sheet.Cells["C1"].Value = "Credit Hours";
+
+                    var row = 2;
+                    foreach (var course in courses)
+                    {
+                        sheet.Cells[$"A{row}"].Value = course.CourseCode;
+                        sheet.Cells[$"B{row}"].Value = course.CourseName;
+                        sheet.Cells[$"C{row}"].Value = course.CreditHours;
+                        row++;
+                    }
+                }
+
+                // Convert the Excel package to a byte array
+                byte[] fileContents = package.GetAsByteArray();
+
+                // Set the content type and file name for the response
+                var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                var fileName = "OfferedCoursesReport.xlsx";
+                await OnGetAsync(OfficerEmail, OfficerPassword);
+                // Return the Excel file as a download
+                return File(fileContents, contentType, fileName);
+            }
+
         }
         public async Task OnGetAsync(string email, string password)
         {
