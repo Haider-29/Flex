@@ -806,16 +806,16 @@
 
     <br />
     <hr />
-  @*  <div class="container">
+    <div class="container mt-5">
         <div class="card">
+            <div class="card-header">
+                Feedback Report
+            </div>
             <div class="card-body">
-                <h3 class="card-title">Feedback Report</h3>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>Faculty ID</th>
                             <th>Student ID</th>
-                          
                             <th>Appearance and Personal Presentation</th>
                             <th>Professional Practices</th>
                             <th>Teaching Methods</th>
@@ -824,23 +824,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var feedback in Model.FeedbackReport)
+                        @foreach (var report in Model.FeedbackReport)
                         {
-                            <tr>
-                                <td>@feedback.StudentID</td>
-                                <td>@feedback.FacultyID</td>
-                                <td>@feedback.AppearanceAndPersonalPresentation</td>
-                                <td>@feedback.ProfessionalPractices</td>
-                                <td>@feedback.TeachingMethods</td>
-                                <td>@feedback.DispositionTowardsStudents</td>
-                                <td>@feedback.AverageScore</td>
-                            </tr>
+                            @foreach (var feedback in report.FeedbackItems)
+                            {
+                                <tr>
+                                    <td>@feedback.StudentId</td>
+                                    <td>@feedback.AppearanceScore</td>
+                                    <td>@feedback.ProfessionalScore</td>
+                                    <td>@feedback.TeachingMethodsScore</td>
+                                    <td>@feedback.DispositionScore</td>
+                                    <td>@feedback.OverallScore</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer">
+                <form method="post" asp-page-handler="GenerateFeedbackReport">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                </form>
+            </div>
+
         </div>
-    </div>*@
+    </div>
+
+
 
 
 

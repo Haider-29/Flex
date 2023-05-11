@@ -505,12 +505,116 @@ namespace FLEXX.Pages
 
         public class FeedbackReportViewModel
         {
-            public string TeacherId { get; set; }
             public List<FeedbackReportItem> FeedbackItems { get; set; }
         }
 
 
         public List<FeedbackReportViewModel> FeedbackReport { get; set; } = new List<FeedbackReportViewModel>();
+
+
+        public async Task<IActionResult> OnPostGenerateFeedbackReportAsync()
+        {
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                // student feedbasck rfeport:
+                string query = "SELECT StudentID, FeedbackFormData FROM Feedback WHERE FacultyID = @TeacherId;";
+                SqlCommand cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@TeacherId", HttpContext.Session.GetString("UserName"));
+
+                SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                List<FeedbackReportItem> feedbackItems = new List<FeedbackReportItem>();
+
+                while (await reader.ReadAsync())
+                {
+                    string studentId = reader.GetString(0);
+                    string feedbackFormData = reader.GetString(1);
+
+                    // Parse the feedback form data
+                    string[] values = feedbackFormData.Split(',');
+
+                    float appearanceScore = (float.Parse(values[0]) + float.Parse(values[1]) + float.Parse(values[2]) + float.Parse(values[3]) + float.Parse(values[4])) / 5;
+                    float professionalScore = (float.Parse(values[5]) + float.Parse(values[6]) + float.Parse(values[7]) + float.Parse(values[8]) + float.Parse(values[9]) + float.Parse(values[10])) / 6;
+                    float teachingMethodsScore = (float.Parse(values[11]) + float.Parse(values[12]) + float.Parse(values[13]) + float.Parse(values[14]) + float.Parse(values[15])) / 5;
+                    float dispositionScore = (float.Parse(values[16]) + float.Parse(values[17]) + float.Parse(values[18]) + float.Parse(values[19])) / 4;
+                    float overallScore = (appearanceScore + professionalScore + teachingMethodsScore + dispositionScore) / 4;
+
+                    FeedbackReportItem item = new FeedbackReportItem
+                    {
+                        StudentId = studentId,
+                        FeedbackFormData = feedbackFormData,
+                        AppearanceScore = appearanceScore,
+                        ProfessionalScore = professionalScore,
+                        TeachingMethodsScore = teachingMethodsScore,
+                        DispositionScore = dispositionScore,
+                        OverallScore = overallScore
+                    };
+
+                    feedbackItems.Add(item);
+
+                    FeedbackReportViewModel ok = new FeedbackReportViewModel
+                    {
+                        FeedbackItems = feedbackItems
+                    };
+
+                    FeedbackReport.Add(ok);
+                }
+
+
+
+                reader.Close();
+                cmd.Dispose();
+
+                connection.Close();
+            }
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("FeedbackReport");
+
+                // Set column headers
+                worksheet.Cells[1, 1].Value = "Student ID";
+                worksheet.Cells[1, 2].Value = "Feedback Form Data";
+                worksheet.Cells[1, 3].Value = "Appearance Score";
+                worksheet.Cells[1, 4].Value = "Professional Score";
+                worksheet.Cells[1, 5].Value = "Teaching Methods Score";
+                worksheet.Cells[1, 6].Value = "Disposition Score";
+                worksheet.Cells[1, 7].Value = "Overall Score";
+
+                // Populate data rows
+                int row = 2;
+                foreach (var report in FeedbackReport)
+                {
+                    foreach (var feedbackItem in report.FeedbackItems)
+                    {
+                        worksheet.Cells[row, 1].Value = feedbackItem.StudentId;
+                        worksheet.Cells[row, 2].Value = feedbackItem.FeedbackFormData;
+                        worksheet.Cells[row, 3].Value = feedbackItem.AppearanceScore;
+                        worksheet.Cells[row, 4].Value = feedbackItem.ProfessionalScore;
+                        worksheet.Cells[row, 5].Value = feedbackItem.TeachingMethodsScore;
+                        worksheet.Cells[row, 6].Value = feedbackItem.DispositionScore;
+                        worksheet.Cells[row, 7].Value = feedbackItem.OverallScore;
+                        row++;
+                    }
+                }
+
+                // Auto-fit columns
+                worksheet.Cells.AutoFitColumns();
+            
+
+                // Convert the Excel package to a byte array
+                var excelFile = package.GetAsByteArray();
+
+                // Download the Excel file
+                var fileName = "FeedbackReport.xlsx";
+
+                await OnGetAsync(TeacherEmail, TeacherPassword);
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+        }
+
 
         // Look here Haider
         // OnGEtAsync may maybe issue ho with the way indexes are being handled for lists
@@ -795,7 +899,6 @@ namespace FLEXX.Pages
 
                     FeedbackReportViewModel ok = new FeedbackReportViewModel
                     {
-                        TeacherId = TeacherEmail,
                         FeedbackItems = feedbackItems
                     };
 
