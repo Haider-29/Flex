@@ -622,6 +622,8 @@ namespace FLEXX.Pages
                 cmd.Parameters.AddWithValue("@TeacherEmail", TeacherEmail);
                 SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
+                
+
                 AssignedSections = new List<MarksDistributionTable>();
 
                 while (await reader.ReadAsync())

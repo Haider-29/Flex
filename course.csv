@@ -1,0 +1,51 @@
+CourseCode,CourseName,CreditHours,PreRequisiteID,Applications
+CS101,Introduction to Programming,4,C10,10
+CS102,Data Structures,4,C11,10
+CS103,Algorithms,4,C12,10
+CS104,Computer Networks,4,C13,10
+CS105,Database Systems,4,C14,10
+CS106,Software Engineering,4,C15,10
+CS107,Web Development,4,C16,10
+CS108,Operating Systems,4,C17,10
+CS109,Computer Architecture,4,C18,10
+CS110,Artificial Intelligence,4,C19,10
+CS111,Machine Learning,4,C20,10
+CS112,Computer Graphics,4,C21,10
+CS113,Human-Computer Interaction,4,C22,10
+CS114,Data Mining,4,C23,10
+CS115,Information Security,4,C24,10
+CS116,Discrete Mathematics,4,C25,10
+CS117,Linear Algebra,4,C26,10
+CS118,Probability and Statistics,4,NULL,10
+CS119,Calculus,4,NULL,10
+CS120,Compiler Design,4,NULL,10
+CS121,Distributed Systems,4,NULL,10
+CS122,Mobile Application Development,4,C40,10
+CS123,Cloud Computing,4,C41,10
+CS124,Computer Vision,4,C42,10
+CS125,Deep Learning,4,C43,10
+CS126,Natural Language Processing,4,C44,1
+CS127,Data Science,4,C45,1
+CS128,Game Development,4,C46,1
+CS129,Internet of Things,4,C47,1
+CS130,Cybersecurity,4,C48,1
+CS131,Parallel Computing,4,NULL,1
+CS132,Robotics,4,NULL,1
+CS133,Software Testing,4,NULL,1
+CS134,Design and Analysis of Algorithms,4,NULL,1
+CS135,Embedded Systems,4,NULL,1
+CS136,Neural Networks,4,NULL,1
+CS137,Pattern Recognition,4,NULL,2
+CS138,Real-Time Systems,4,NULL,2
+CS139,Simulation and Modeling,4,NULL,2
+CS140,Virtual Reality,4,NULL,2
+CS141,Big Data,4,NULL,2
+CS142,Bioinformatics,4,C50,2
+CS143,Cryptography,4,NULL,2
+CS144,Data Visualization,4,NULL,2
+CS145,High Performance Computing,4,NULL,2
+CS146,Human-Robot Interaction,4,NULL,2
+CS147,Quantum Computing,4,NULL,2
+CS148,Reinforcement Learning,4,NULL,6
+CS149,Signal Processing,4,NULL,6
+CS150,Wireless Communication,4,NULL,6
