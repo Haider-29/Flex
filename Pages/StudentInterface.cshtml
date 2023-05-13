@@ -548,7 +548,6 @@
             }
         </div>
     </div>
-        </div>
 
 
 
@@ -924,41 +923,43 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Fall 2021', 'Spring 2022', 'Fall 2022', 'Spring 2023'],
-                    datasets: [{
-                        data: [4, 3, 3.5, 2.5],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
+        var ctx = document.getElementById('myChart').getContext('2d');
+
+        // Calculate the CGPA dynamically
+        var totalGradePoints = @Model.transcripts.Sum(t => t.GetGradePoints() * t.CreditHours);
+        var totalCreditHours = @Model.transcripts.Sum(t => t.CreditHours);
+        var cgpa = totalCreditHours > 0 ? totalGradePoints / totalCreditHours : 0;
+
+        // Create the chart
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['CGPA'],
+                datasets: [{
+                    data: [cgpa.toFixed(2)],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 4.0 // Adjust the maximum value of the y-axis as needed
                     }
                 }
-            });
+            }
+        });
         </script>
 
     <script>
@@ -1089,10 +1090,12 @@
             const courseSelectAttendance = document.getElementById('courseSelectAttendance');
             courseSelectAttendance.addEventListener('click', function () {
                 changeCardHeader(this.value);
+                calculateAttendance();
             });
-            courseSelectAttendance.addEventListener('change', calculateAttendance);
-            courseSelectAttendance.addEventListener('click', calculateAttendance);
-
+            courseSelectAttendance.addEventListener('change', function () {
+                changeCardHeader(this.value);
+                calculateAttendance();
+            });
             const courseSelectMarks = document.getElementById('courseSelectMarks');
             courseSelectMarks.addEventListener('click', function () {
                 changeMarksHeader(this.value);
