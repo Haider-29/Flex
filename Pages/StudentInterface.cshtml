@@ -211,10 +211,10 @@
                             <a class="nav-link" data-toggle="pill" href="#assignments">Assignments</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#sesional1">Sessional I</a>
+                            <a class="nav-link" data-toggle="pill" href="#sessional1">Sessional I</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#sesional2">Sessional II</a>
+                            <a class="nav-link" data-toggle="pill" href="#sessional2">Sessional II</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="pill" href="#project">Project</a>
@@ -1099,9 +1099,11 @@
             const courseSelectMarks = document.getElementById('courseSelectMarks');
             courseSelectMarks.addEventListener('click', function () {
                 changeMarksHeader(this.value);
+                onCourseSelect();
             });
             courseSelectMarks.addEventListener('change', function () {
                 changeMarksHeader(this.value);
+                onCourseSelect();
             });
         });
 
