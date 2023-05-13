@@ -548,71 +548,73 @@
                 <h4>Section Evaluation Marks</h4>
         </div>
         <div class="card-body">
-                <form method="post" asp-page-handler="SaveSectionEvaluation">
+                <form method="post">
 
-                <div class="row mb-3">
-                    <label for="sectionSelect" class="col-sm-2 col-form-label">Select Section</label>
-                    <div class="col-sm-4">
-                            <select asp-for="NSectionID" class="form-select" id="section-select" onchange="filterMarks(this.value, 'studentsTableBody')">
-
+                    <div class="row mb-3">
+                        <label for="sectionSelect" class="col-sm-2 col-form-label">Select Section</label>
+                        <div class="col-sm-4">
+                            <select name="NSectionID" class="form-select" id="section-select" onchange="filterMarks(this.value, 'studentsTableBody')">
                                 @foreach (var course in Model.AssignedSections)
                                 {
                                     <option>@course.SectionName</option>
                                 }
-                        </select>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="evalSelect" class="col-sm-2 col-form-label">Select Evaluation</label>
-                    <div class="col-sm-4">
-                            <select asp-for="SelectedEvaluationType" class="form-select" id="evalSelect">
+
+                    <div class="row mb-3">
+                        <label for="evalSelect" class="col-sm-2 col-form-label">Select Evaluation</label>
+                        <div class="col-sm-4">
+                            <select name="SelectedEvaluationType" class="form-select" id="evalSelect">
                                 <option selected disabled>Select Evaluation</option>
-                            <option value="quiz">Quiz</option>
-                            <option value="assignment">Assignment</option>
-                            <option value="sessional1">Sessional 1</option>
-                            <option value="sessional2">Sessional 2</option>
-                            <option value="project">Project</option>
-                            <option value="final">Final Exam</option>
-                            <option value="presentation">Presentation</option>
-                        </select>
+                                <option value="quiz">Quiz</option>
+                                <option value="assignment">Assignment</option>
+                                <option value="sessional1">Sessional 1</option>
+                                <option value="sessional2">Sessional 2</option>
+                                <option value="project">Project</option>
+                                <option value="final">Final Exam</option>
+                                <option value="presentation">Presentation</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+
                     <div class="row mb-3">
                         <label for="evalNum" class="col-sm-2 col-form-label">Evaluation Number</label>
                         <div class="col-sm-4">
-                            <input asp-for="NEvaluationNumber" type="number" class="form-control" id="evalNum" placeholder="Enter Evaluation Number">
+                            <input name="NEvaluationNumber" type="number" class="form-control" id="evalNum" placeholder="Enter Evaluation Number">
                         </div>
                     </div>
-                <table class="table table-bordered">    
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Roll Number</th>
-                            <th>Marks Obtained</th>
-                        </tr>
-                    </thead>
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Roll Number</th>
+                                <th>Marks Obtained</th>
+                            </tr>
+                        </thead>
                         <tbody id="studentsTableBody">
-                            @{
-                                int counter2 = 0;
-                                foreach (var student in Model.Students)
-                                {
-                                    <tr>
-                                        <td>@student.Name</td>
-                                        <td>@student.RollNum</td>
-                                        <td><input asp-for="Model.StudentMarks[{@counter2}].MarksObtained" type="number" class="form-control" id="student3MarksObtained" placeholder="Marks Obtained"></td>
-                                    </tr>
-                                    counter2++;
-                                }
+                            @foreach (var student in Model.Students)
+                            {
+                                <tr>
+                                    <td>@student.Name</td>
+                                    <td>
+                                        <input type="hidden" name="studentIds[]" value="@student.RollNum" />
+                                        @student.RollNum
+                                    </td>
+                                    <td>
+                                        <input name="marks[]" type="number" class="form-control" placeholder="Marks Obtained">
+                                    </td>
+                                </tr>
                             }
+                        </tbody>
+                    </table>
 
-
-
-                    </tbody>
-                </table>
                     <p class="alert alert-danger mt-3 text-center" role="alert" style="@(!string.IsNullOrEmpty(Model.SaveMarksMessage) ? "" : "display:none;")">@Model.Message</p>
 
-                <button type="submit" class="btn btn-primary">Save Marks</button>
-            </form>
+                    <button type="submit" class="btn btn-primary">Save Marks</button>
+                </form>
+
         </div>
     </div>
 
@@ -762,7 +764,7 @@
     <div class="container mt-5">
         <form method="post" asp-page-handler="FilterSection">
             <div class="form-group">
-                <label for="courseSelect">Select Course:</label>
+                <label for="courseSelect">Select Section:</label>
                 <select class="form-control" id="courseSelect" name="selectedSectionID">
                     @foreach (var course in Model.AssignedSections)
                     {

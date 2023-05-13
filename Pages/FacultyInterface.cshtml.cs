@@ -8,6 +8,7 @@ using System.Reflection.PortableExecutable;
 using System.Linq;
 using OfficeOpenXml;
 using System.IO;
+using System.Globalization;
 
 namespace FLEXX.Pages
 {
@@ -219,27 +220,28 @@ namespace FLEXX.Pages
 
         // Look here Haider
         // ye function call hota wehn save marks button is pressed
-        public async Task<IActionResult> OnPostSaveSectionEvaluationAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
-            // You need to get the necessary input data from the form
-            string[] studentIds = StudentIds;
-            string sectionId = NSectionID;
-            string evaluationType = SelectedEvaluationType;
-            int evaluationNumber = NEvaluationNumber;
-            List<StudentMark> studentMarks = StudentMarks;
+            var studentIds = Request.Form["studentIds[]"].ToList();
+            var marks = Request.Form["marks[]"].Select(x => int.Parse(x)).ToList();
+            string sectionId = Request.Form["NSectionID"];
+            string evaluationType = Request.Form["SelectedEvaluationType"];
+            evaluationType = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(evaluationType);
 
+            int evaluationNumber = int.Parse(Request.Form["NEvaluationNumber"]);
+            List<StudentMark> studentMarks = StudentMarks;
+            TeacherEmail = HttpContext.Session.GetString("UserName");
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
 
-                // Get the EvaluationID based on the sectionId, evaluationType, and evaluationNumber
                 string getEvaluationIdQuery = "SELECT EvaluationID FROM Evaluation WHERE SectionID = @SectionID AND EvaluationType = @EvaluationType AND EvaluationNumber = @EvaluationNumber";
                 SqlCommand getEvaluationIdCmd = new SqlCommand(getEvaluationIdQuery, connection);
-                getEvaluationIdCmd.Parameters.AddWithValue("@SectionID", NSectionID);
-                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationType", SelectedEvaluationType);
-                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationNumber", NEvaluationNumber);
-                Console.Write(getEvaluationIdCmd.ToString());
+                getEvaluationIdCmd.Parameters.AddWithValue("@SectionID", sectionId);
+                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationType", evaluationType);
+                getEvaluationIdCmd.Parameters.AddWithValue("@EvaluationNumber", evaluationNumber);
 
                 int evaluationId = 0;
                 SqlDataReader reader = await getEvaluationIdCmd.ExecuteReaderAsync();
@@ -257,25 +259,17 @@ namespace FLEXX.Pages
 
                 if (evaluationId == 0)
                 {
-                    Console.Write(evaluationId);
                     SaveMarksMessage = "Failed to find the EvaluationID. Please check the input data.";
                     await OnGetAsync(TeacherEmail, TeacherPassword);
                     return Page();
                 }
 
-
-
-
-                Console.Write(evaluationId);
-                // insert marks records
                 string query = "INSERT INTO Marks (MarksID, StudentID, EvaluationID, EvaluationType, Score) " +
                 "VALUES (@MarksID, @StudentID, @EvaluationID, @EvaluationType, @Score)";
                 SqlCommand cmd = new SqlCommand(query, connection);
 
-                for (int i = 0; i < studentIds.Length; i++)
+                for (int i = 0; i < studentIds.Count; i++)
                 {
-
-                    Console.Write("OK");
                     string generateID = "Select TOP 1 MarksID from Marks ORDER BY MarksID desc";
                     SqlCommand idcommand = new SqlCommand(generateID, connection);
                     SqlDataReader idReader = await idcommand.ExecuteReaderAsync();
@@ -293,42 +287,21 @@ namespace FLEXX.Pages
                     idReader.Close();
                     idcommand.Dispose();
                     cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@MarksID", marksID); // Generate a unique ID for the Marks record
-                    cmd.Parameters.AddWithValue("@StudentID", StudentMarks[i].id);
-                    cmd.Parameters.AddWithValue("@EvaluationType", SelectedEvaluationType);
+                    cmd.Parameters.AddWithValue("@MarksID", marksID);
+                    cmd.Parameters.AddWithValue("@StudentID", studentIds[i]);
+                    cmd.Parameters.AddWithValue("@EvaluationType", evaluationType);
                     cmd.Parameters.AddWithValue("@EvaluationID", evaluationId);
-                    cmd.Parameters.AddWithValue("@Score", StudentMarks[i].MarksObtained);
+                    cmd.Parameters.AddWithValue("@Score", marks[i]);
 
-                    try
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected <= 0)
                     {
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                        if (rowsAffected <= 0)
-                        {
-                            // Insertion failed
-                            SaveMarksMessage = "Failed to save the marks for one or more students.";
-
-                        }
-                        else
-                        {
-                            SaveMarksMessage = "Marks saved!";
-                        }
+                        SaveMarksMessage = "Failed to save the marks for one or more students.";
                     }
-                    catch (SqlException ex)
+                    else
                     {
-                        if (ex.Number == 2627)
-                        {
-                            // Primary key violation (duplicate record)
-                            SaveMarksMessage = "The marks record already exists.";
-                        }
-                        else
-                        {
-                            // Other SQL errors
-                            SaveMarksMessage = "An error occurred while saving the marks. Please try again.";
-                        }
-
-
-
+                        SaveMarksMessage = "Marks saved!";
                     }
                 }
 
@@ -336,10 +309,10 @@ namespace FLEXX.Pages
                 connection.Close();
             }
 
-            // Refresh the page and show the message
             await OnGetAsync(TeacherEmail, TeacherPassword);
             return Page();
         }
+
 
 
         public async Task<IActionResult> OnPostAddAttendanceAsync()
